@@ -15,6 +15,21 @@ const integerFormatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 0,
 });
 
+const DEFAULT_THEME = 'forest';
+const THEME_KEYS = [
+  'snow',
+  'beach',
+  'forest',
+  'sun',
+  'moon',
+  'autumn',
+  'neon',
+  'pastel',
+  'pop',
+  'cookie',
+  'matcha',
+];
+
 function createDefaultGameState() {
   return {
     balance: 0,
@@ -22,6 +37,7 @@ function createDefaultGameState() {
     plants: 0,
     currentHoeIndex: 0,
     selectedHoeIndex: 0,
+    theme: DEFAULT_THEME,
     fertilizers: {
       mud: 0,
       soil: 0,
@@ -188,6 +204,7 @@ function mergeGameState(savedGame) {
     },
     inventory: { ...(savedGame.inventory || {}) },
     selectedFertilizer: savedGame.selectedFertilizer || '',
+    theme: THEME_KEYS.includes(savedGame.theme) ? savedGame.theme : DEFAULT_THEME,
   };
 }
 
@@ -221,6 +238,42 @@ function ensureValidSelections() {
   if (!game.selectedFertilizer || !fertilizerDefs[game.selectedFertilizer]) {
     game.selectedFertilizer = '';
   }
+  if (!THEME_KEYS.includes(game.theme)) {
+    game.theme = DEFAULT_THEME;
+  }
+}
+
+function applyTheme(themeKey) {
+  const nextTheme = THEME_KEYS.includes(themeKey) ? themeKey : DEFAULT_THEME;
+  document.body.setAttribute('data-theme', nextTheme);
+}
+
+function updateThemeSelect() {
+  const themeSelect = document.getElementById('theme-select');
+  if (themeSelect) {
+    themeSelect.value = game.theme;
+  }
+}
+
+function updateThemeCards() {
+  const cards = document.querySelectorAll('.theme-card');
+  cards.forEach((card) => {
+    const key = card.getAttribute('data-theme');
+    const isActive = key === game.theme;
+    card.classList.toggle('active', isActive);
+    card.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+}
+
+function setTheme(themeKey) {
+  if (!THEME_KEYS.includes(themeKey)) {
+    themeKey = DEFAULT_THEME;
+  }
+  game.theme = themeKey;
+  applyTheme(themeKey);
+  updateThemeSelect();
+  updateThemeCards();
+  saveGame();
 }
 
 function updateFertilizerDropdown() {
@@ -350,6 +403,8 @@ function updateMainUI() {
     }
   }
   updateInventoryUI();
+  updateThemeSelect();
+  updateThemeCards();
 }
 
 function farm() {
@@ -632,6 +687,13 @@ function bindSelectionInputs() {
       saveGame();
     });
   }
+
+  const themeSelect = document.getElementById('theme-select');
+  if (themeSelect) {
+    themeSelect.addEventListener('change', function handleThemeChange() {
+      setTheme(this.value);
+    });
+  }
 }
 
 function bindActionButtons() {
@@ -738,6 +800,12 @@ function handleDocumentClick(event) {
     renderShopPage();
     updateFertilizerDropdown();
   }
+
+  const themeCard = target.closest && target.closest('.theme-card');
+  if (themeCard) {
+    const themeKey = themeCard.getAttribute('data-theme');
+    setTheme(themeKey);
+  }
 }
 
 function scheduleAutoSave() {
@@ -754,6 +822,7 @@ function scheduleAutoSave() {
 function initializeGame() {
   loadGame();
   ensureValidSelections();
+  applyTheme(game.theme);
   updateMainUI();
   bindSelectionInputs();
   bindActionButtons();
@@ -768,6 +837,7 @@ function initializeGame() {
 
 document.addEventListener('DOMContentLoaded', () => {
   initializeGame();
+  updateThemeCards();
 
   const bodyClassList = document.body.classList;
   if (bodyClassList.contains('page-upgrades')) {

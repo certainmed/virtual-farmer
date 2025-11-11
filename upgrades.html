@@ -6,17 +6,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="page-upgrades">
+<body class="page-upgrades" data-theme="forest">
   <header class="site-header">
     <div class="brand">
       <span class="brand-icon" aria-hidden="true">🌱</span>
       <span class="brand-name">Virtual Farmer</span>
     </div>
-    <nav class="site-nav" aria-label="Primary navigation">
-      <a class="nav-link" data-page="page-index" href="index.html">Farming</a>
-      <a class="nav-link" data-page="page-upgrades" href="upgrades.html">Upgrades</a>
-      <a class="nav-link" data-page="page-shop-overview" href="shop.html">Shop</a>
-    </nav>
+    <div class="header-actions">
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a class="nav-link" data-page="page-index" href="index.html">Farming</a>
+        <a class="nav-link" data-page="page-upgrades" href="upgrades.html">Upgrades</a>
+        <a class="nav-link" data-page="page-shop-overview" href="shop.html">Shop</a>
+      </nav>
+      <label class="theme-switcher" for="theme-select">
+        <span class="theme-switcher-label">Theme</span>
+        <select id="theme-select" class="theme-select" aria-label="Select visual theme">
+          <option value="snow">Snow</option>
+          <option value="beach">Beach</option>
+          <option value="forest">Forest</option>
+          <option value="sun">Sun</option>
+          <option value="moon">Moon</option>
+          <option value="autumn">Autumn</option>
+          <option value="neon">Neon</option>
+          <option value="pastel">Pastel</option>
+          <option value="pop">Pop</option>
+          <option value="cookie">Cookie</option>
+          <option value="matcha">Matcha</option>
+        </select>
+      </label>
+    </div>
   </header>
   <main class="page-content">
     <section class="panel" aria-labelledby="upgrades-heading">
