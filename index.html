@@ -6,23 +6,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="page-index">
+<body class="page-index" data-theme="forest">
   <header class="site-header">
     <div class="brand">
       <span class="brand-icon" aria-hidden="true">🌱</span>
       <span class="brand-name">Virtual Farmer</span>
     </div>
-    <nav class="site-nav" aria-label="Primary navigation">
-      <a class="nav-link" data-page="page-index" href="index.html">Farming</a>
-      <a class="nav-link" data-page="page-upgrades" href="upgrades.html">Upgrades</a>
-      <a class="nav-link" data-page="page-shop-overview" href="shop.html">Shop</a>
-    </nav>
+    <div class="header-actions">
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a class="nav-link" data-page="page-index" href="index.html">Farming</a>
+        <a class="nav-link" data-page="page-upgrades" href="upgrades.html">Upgrades</a>
+        <a class="nav-link" data-page="page-shop-overview" href="shop.html">Shop</a>
+      </nav>
+      <label class="theme-switcher" for="theme-select">
+        <span class="theme-switcher-label">Theme</span>
+        <select id="theme-select" class="theme-select" aria-label="Select visual theme">
+          <option value="snow">Snow</option>
+          <option value="beach">Beach</option>
+          <option value="forest">Forest</option>
+          <option value="sun">Sun</option>
+          <option value="moon">Moon</option>
+          <option value="autumn">Autumn</option>
+          <option value="neon">Neon</option>
+          <option value="pastel">Pastel</option>
+          <option value="pop">Pop</option>
+          <option value="cookie">Cookie</option>
+          <option value="matcha">Matcha</option>
+        </select>
+      </label>
+    </div>
   </header>
   <main class="page-content">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-content">
-        <h1 id="hero-title">Grow a thriving digital farm</h1>
-        <p>Optimize your tools, invest in upgrades, and cultivate high-value crops to expand your farming empire.</p>
+        <p class="hero-kicker">Interactive farming simulator</p>
+        <h1 id="hero-title">Design your dream biomes and grow a thriving digital farm</h1>
+        <p>Cycle through snow, beach, forest, sun, moon, autumn, neon, pastel, pop, cookie, and matcha moods while you optimize tools, invest in upgrades, and harvest premium crops.</p>
       </div>
     </section>
     <section class="panel stats-panel" aria-labelledby="stats-heading">
@@ -78,6 +97,58 @@
       </div>
       <div id="inventory-list" class="inventory-grid">
         <p class="empty-state">Your inventory is empty. Start farming to fill it with crops.</p>
+      </div>
+    </section>
+    <section class="panel theme-panel" aria-labelledby="theme-heading">
+      <div class="panel-header">
+        <h2 id="theme-heading">Moodboard Themes</h2>
+        <p>Tap a card to instantly restyle the interface with immersive lighting and color palettes.</p>
+      </div>
+      <div class="theme-grid" role="list">
+        <button type="button" class="theme-card" data-theme="snow" role="listitem" aria-pressed="false">
+          <span class="theme-card-title">Snow</span>
+          <span class="theme-card-accent" aria-hidden="true">❄️</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="beach" role="listitem" aria-pressed="false">
+          <span class="theme-card-title">Beach</span>
+          <span class="theme-card-accent" aria-hidden="true">🏖️</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="forest" role="listitem" aria-pressed="false">
+          <span class="theme-card-title">Forest</span>
+          <span class="theme-card-accent" aria-hidden="true">🌲</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="sun" role="listitem" aria-pressed="false">
+          <span class="theme-card-title">Sun</span>
+          <span class="theme-card-accent" aria-hidden="true">☀️</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="moon" role="listitem" aria-pressed="false">
+          <span class="theme-card-title">Moon</span>
+          <span class="theme-card-accent" aria-hidden="true">🌙</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="autumn" role="listitem" aria-pressed="false">
+          <span class="theme-card-title">Autumn</span>
+          <span class="theme-card-accent" aria-hidden="true">🍂</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="neon" role="listitem" aria-pressed="false">
+          <span class="theme-card-title">Neon</span>
+          <span class="theme-card-accent" aria-hidden="true">⚡</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="pastel" role="listitem" aria-pressed="false">
+          <span class="theme-card-title">Pastel</span>
+          <span class="theme-card-accent" aria-hidden="true">🎨</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="pop" role="listitem" aria-pressed="false">
+          <span class="theme-card-title">Pop</span>
+          <span class="theme-card-accent" aria-hidden="true">🎉</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="cookie" role="listitem" aria-pressed="false">
+          <span class="theme-card-title">Cookie</span>
+          <span class="theme-card-accent" aria-hidden="true">🍪</span>
+        </button>
+        <button type="button" class="theme-card" data-theme="matcha" role="listitem" aria-pressed="false">
+          <span class="theme-card-title">Matcha</span>
+          <span class="theme-card-accent" aria-hidden="true">🍵</span>
+        </button>
       </div>
     </section>
   </main>
