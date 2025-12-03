@@ -1,39 +1,63 @@
-# Virtual Farmer
+# 🌾 Virtual Farming Simulator
 
-**Virtual Farmer** is a browser-based incremental farming game built with vanilla JavaScript, HTML, and CSS. Manage your own virtual farm by planting crops, upgrading your tools, and purchasing fertilizers and equipment from dedicated in-game shops. With a fully responsive interface, automatic saving using `localStorage`, and a multi-page structure, Virtual Farmer provides an engaging and continuously evolving farming experience.
+A browser-based incremental farming game where you grow crops, unlock better tools, and progress through various upgrades and achievements.
+
+## Overview
+
+Virtual Farming Simulator is a single-page HTML/JavaScript game that runs entirely in the browser. Players harvest crops, sell them for money, and invest in upgrades to increase their farming efficiency. The game features a prestige system for long-term progression and saves progress automatically to local storage [file:1].
 
 ## Features
 
-- **Incremental Farming:**  
-  Click the **Farm** button to plant crops and earn XP along with virtual currency. Your yield and XP depend on your selected hoe, active fertilizer, and various upgrades.
+### 🌱 Core Gameplay
+- **Farming**: Click the Farm button or press Space to harvest crops
+- **20 Plant Types**: Ranging from common vegetables (Lettuce, Potato) to legendary items (Truffle, Saffron)
+- **5 Rarity Tiers**: Normal, Rare, Epic, Mythical, and Legendary plants with increasing values
 
-- **Dynamic Inventory:**  
-  Harvested crops are stored in your inventory, and the total plant count is updated in real time. Sell your crops at optimal prices to increase your balance.
+### ⛏️ Tools & Equipment
+- **13 Hoes**: Progress from Wooden Hoe (1.0x multiplier) to Titanium Hoe (3.5x multiplier)
+- **10 Fertilizers**: Consumable items that boost yield (Mud, Soil, Compost, Bio, Chemical, and more)
+- Each hoe unlocks access to higher-tier plants [file:1]
 
-- **Upgrades with Descriptive Effects:**  
-  Improve various aspects of your farm with upgrades such as:
-  - *Sharper Tools* – Increases base yield by +1 per level.
-  - *Expert Farmer* – Improves plant quality, boosting sell price.
-  - *Businessman* – Enhances the plant sell price.
-  - *Experienced* – Boosts XP gain.
-  - *Duplicator* – Provides a chance to double yield.
-  - *Irrigation System* – Multiplies overall yield.
-  - *Automated Sprinkler* – Adds extra yield per farm.
-  - *Fertilizer Efficiency* – Boosts fertilizer bonus by 10% per level.
-  - *Market Specialist* – Further increases sell price.
-  - *Advanced Analytics* – Optimizes farming decisions.
-  - *Seed Multiplier* – Increases seed production.
+### ⬆️ Upgrades
+| Upgrade | Effect | Max Level |
+|---------|--------|-----------|
+| Sharper Tools | +1 yield per level | 20 |
+| Expert Farmer | +10% sell price | 10 |
+| Irrigation System | ×1.2 yield | 5 |
+| Duplicator | +5% chance to double yield | 3 |
+| Experienced | +20% XP per level | 5 |
 
-- **Responsive Shops with Pagination:**  
-  Navigate through the Hoe Shop and Fertilizer Shop via multi-page interfaces. In the Hoe Shop, purchase new hoes and equip them; once equipped, the corresponding button displays “Equipped” and becomes disabled.
+### ⭐ Prestige System
+Reset progress to earn permanent bonuses (+2% per prestige level, +1% per prestige point). This allows for infinite progression and replayability [file:1].
 
-- **Fertilizer Consumption Mechanics:**  
-  The amount of fertilizer consumed during farming depends on the crop rarity:
-  - **Normal:** Consumes 1 unit.
-  - **Rare/Uncommon:** Consumes 2 units.
-  - **Epic:** Consumes 3 units.
-  - **Legendary:** Consumes 4 units.
-  - **Mythical:** Consumes 5 units.
+### 🏆 Achievements
+12 achievements including First Steps, Millionaire, Tool Master, Collector, and more—each tracking different milestones.
 
-- **Auto-Save & Multi-Page Navigation:**  
-  Game progress is automatically saved every 5 seconds and before the page unloads. Use the header navigation links to switch seamlessly between Farming, Upgrades, and Shop pages.
+## Controls
+
+| Key | Action |
+|-----|--------|
+| Space | Farm |
+| S | Sell all plants |
+| 1-9 | Select hoe |
+| F | Cycle fertilizer |
+
+## Technical Details
+
+- **Technology**: Vanilla HTML5, CSS3, JavaScript (no frameworks)
+- **Storage**: LocalStorage for save/load functionality
+- **Export/Import**: Base64-encoded save data for backup
+- **Responsive**: Mobile-friendly design with media queries [file:1]
+
+## Installation
+
+1. Download the `virtualfarm.html` file
+2. Open it in any modern web browser
+3. No server or installation required
+
+## Save System
+
+- Auto-saves to browser localStorage
+- Export saves as Base64 strings
+- Import previously exported saves
+- Full reset option available in Settings
