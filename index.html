@@ -826,7 +826,10 @@
             { name: "Mythic Hoe", multiplier: 3.6, cost: 15000, emoji: "🔮" },
             { name: "Platinum Hoe", multiplier: 5.2, cost: 20000, emoji: "🪙" },
             { name: "Titanium Hoe", multiplier: 6.99, cost: 450000, emoji: "⚡" },
-            { name: "God Hoe", multiplier: 10.9, cost: 950000, emoji: "✨" }
+            { name: "God Hoe", multiplier: 10.9, cost: 950000, emoji: "✨" },
+            { name: "Dark Matter Hoe", multiplier: 15.0, cost: 2500000, emoji: "🌌" },
+            { name: "Quantum Hoe", multiplier: 25.0, cost: 10000000, emoji: "⚛️" },
+            { name: "Singularity Hoe", multiplier: 50.0, cost: 50000000, emoji: "🕳️" }
         ];
 
         const PLANTS = [
@@ -887,7 +890,10 @@
             { name: "Vermicompost", bonus: 12, cost: 1000, emoji: "🪱" },
             { name: "Liquid", bonus: 15, cost: 1200, emoji: "💧" },
             { name: "Chemical", bonus: 30, cost: 1500, emoji: "⚗️" },
-            { name: "Superphosphate", bonus: 40, cost: 1800, emoji: "🔬" }
+            { name: "Superphosphate", bonus: 40, cost: 1800, emoji: "🔬" },
+            { name: "Growth Serum", bonus: 100, cost: 5000, emoji: "🧪" },
+            { name: "Magic Dust", bonus: 250, cost: 15000, emoji: "✨" },
+            { name: "Time Warp", bonus: 1000, cost: 50000, emoji: "⏳" }
         ];
 
         const UPGRADES = [
@@ -919,7 +925,10 @@
             { id: "speedRunner", name: "Speed Runner", desc: "Perform 100 farms in one session", icon: "⚡", check: (g, s) => s.sessionFarms >= 100 },
             { id: "richFarmer", name: "Rich Farmer", desc: "Have $50,000 balance at once", icon: "💎", check: (g) => g.balance >= 50000 },
             { id: "upgradeAddict", name: "Upgrade Addict", desc: "Purchase 50 total upgrade levels", icon: "⬆️", check: (g) => Object.values(g.upgrades).reduce((a, b) => a + b, 0) >= 50 },
-            { id: "completionist", name: "Completionist", desc: "Max all upgrades", icon: "🏅", check: (g) => UPGRADES.every(u => g.upgrades[u.id] >= u.maxLevel) }
+            { id: "completionist", name: "Completionist", desc: "Max all upgrades", icon: "🏅", check: (g) => UPGRADES.every(u => g.upgrades[u.id] >= u.maxLevel) },
+            { id: "legendaryFarmer", name: "Legendary Farmer", desc: "Harvest 100 Legendary plants", icon: "💎", check: (g, s) => s.legendaryHarvested >= 100 },
+            { id: "billionaire", name: "Billionaire", desc: "Reach 1 Billion balance", icon: "🤑", check: (g) => g.balance >= 1000000000 },
+            { id: "prestigeMaster", name: "Prestige Master", desc: "Reach Prestige level 10", icon: "👑", check: (g) => g.prestigeLevel >= 10 }
         ];
 
         const RARITY_CONSUMPTION = { normal: 1, rare: 2, epic: 3, legendary: 4, mythical: 5, relic: 20, ancient: 80, exalted: 320 };
