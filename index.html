@@ -572,7 +572,7 @@
             resize: vertical;
             margin-bottom: 20px;
         }
-
+        
         .modal-content textarea:focus {
             outline: none;
             border-color: var(--primary);
@@ -614,7 +614,7 @@
                 justify-content: center;
                 width: 100%;
             }
-
+            
             nav button {
                 flex: 1 1 auto;
                 text-align: center;
@@ -635,7 +635,7 @@
                 min-height: 50px;
                 width: 100%;
             }
-
+            
             .farm-controls {
                 flex-direction: column;
             }
@@ -826,7 +826,10 @@
             { name: "Mythic Hoe", multiplier: 3.6, cost: 15000, emoji: "🔮" },
             { name: "Platinum Hoe", multiplier: 5.2, cost: 20000, emoji: "🪙" },
             { name: "Titanium Hoe", multiplier: 6.99, cost: 450000, emoji: "⚡" },
-            { name: "God Hoe", multiplier: 10.9, cost: 950000, emoji: "✨" }
+            { name: "God Hoe", multiplier: 10.9, cost: 950000, emoji: "✨" },
+            { name: "Dark Matter Hoe", multiplier: 15.0, cost: 2500000, emoji: "🌌" },
+            { name: "Quantum Hoe", multiplier: 25.0, cost: 10000000, emoji: "⚛️" },
+            { name: "Singularity Hoe", multiplier: 50.0, cost: 50000000, emoji: "🕳️" }
         ];
 
         const PLANTS = [
@@ -887,7 +890,10 @@
             { name: "Vermicompost", bonus: 12, cost: 1000, emoji: "🪱" },
             { name: "Liquid", bonus: 15, cost: 1200, emoji: "💧" },
             { name: "Chemical", bonus: 30, cost: 1500, emoji: "⚗️" },
-            { name: "Superphosphate", bonus: 40, cost: 1800, emoji: "🔬" }
+            { name: "Superphosphate", bonus: 40, cost: 1800, emoji: "🔬" },
+            { name: "Growth Serum", bonus: 100, cost: 5000, emoji: "🧪" },
+            { name: "Magic Dust", bonus: 250, cost: 15000, emoji: "✨" },
+            { name: "Time Warp", bonus: 1000, cost: 50000, emoji: "⏳" }
         ];
 
         const UPGRADES = [
@@ -919,7 +925,10 @@
             { id: "speedRunner", name: "Speed Runner", desc: "Perform 100 farms in one session", icon: "⚡", check: (g, s) => s.sessionFarms >= 100 },
             { id: "richFarmer", name: "Rich Farmer", desc: "Have $50,000 balance at once", icon: "💎", check: (g) => g.balance >= 50000 },
             { id: "upgradeAddict", name: "Upgrade Addict", desc: "Purchase 50 total upgrade levels", icon: "⬆️", check: (g) => Object.values(g.upgrades).reduce((a, b) => a + b, 0) >= 50 },
-            { id: "completionist", name: "Completionist", desc: "Max all upgrades", icon: "🏅", check: (g) => UPGRADES.every(u => g.upgrades[u.id] >= u.maxLevel) }
+            { id: "completionist", name: "Completionist", desc: "Max all upgrades", icon: "🏅", check: (g) => UPGRADES.every(u => g.upgrades[u.id] >= u.maxLevel) },
+            { id: "legendaryFarmer", name: "Legendary Farmer", desc: "Harvest 100 Legendary plants", icon: "💎", check: (g, s) => s.legendaryHarvested >= 100 },
+            { id: "billionaire", name: "Billionaire", desc: "Reach 1 Billion balance", icon: "🤑", check: (g) => g.balance >= 1000000000 },
+            { id: "prestigeMaster", name: "Prestige Master", desc: "Reach Prestige level 10", icon: "👑", check: (g) => g.prestigeLevel >= 10 }
         ];
 
         const RARITY_CONSUMPTION = { normal: 1, rare: 2, epic: 3, legendary: 4, mythical: 5, relic: 20, ancient: 80, exalted: 320 };
@@ -1070,28 +1079,28 @@
         function calculateYield() {
             const hoe = HOES[game.selectedHoeIndex];
             let baseYield = 10 + game.selectedHoeIndex * 5 + Math.floor(Math.random() * 10);
-
+            
             // Hoe multiplier
             baseYield *= hoe.multiplier;
-
+            
             // Prestige bonus
             baseYield *= (1 + game.prestigeBonus / 100);
-
+            
             // Sharper Tools
             baseYield += game.upgrades.sharperTools || 0;
-
+            
             // Automated Sprinkler
             baseYield += (game.upgrades.automatedSprinkler || 0) * 2;
-
+            
             // Irrigation System (multiplicative)
             baseYield *= Math.pow(1.2, game.upgrades.irrigationSystem || 0);
-
+            
             // Seed Multiplier
             baseYield *= (1 + (game.upgrades.seedMultiplier || 0) * 0.05);
-
+            
             // Advanced Analytics
             baseYield *= (1 + (game.upgrades.advancedAnalytics || 0) * 0.03);
-
+            
             // Fertilizer
             if (game.selectedFertilizer !== "none" && game.fertilizers[game.selectedFertilizer] > 0) {
                 const fert = FERTILIZERS.find(f => f.name === game.selectedFertilizer);
@@ -1101,13 +1110,13 @@
                     baseYield += fertBonus;
                 }
             }
-
+            
             // Duplicator chance
             const dupChance = (game.upgrades.duplicator || 0) * 0.05;
             if (Math.random() < dupChance) {
                 baseYield *= 2;
             }
-
+            
             return Math.floor(baseYield);
         }
 
@@ -1128,7 +1137,7 @@
                     }
                 }
             }
-
+            
             // Apply price multipliers
             let multiplier = 1;
             multiplier *= (1 + (game.upgrades.expertFarmer || 0) * 0.1);
@@ -1136,7 +1145,7 @@
             multiplier *= (1 + (game.upgrades.marketSpecialist || 0) * 0.05);
             multiplier *= (1 + (game.upgrades.advancedAnalytics || 0) * 0.03);
             multiplier *= (1 + game.prestigeBonus / 100);
-
+            
             return Math.floor(totalValue * multiplier);
         }
 
@@ -1151,20 +1160,20 @@
         // ==================== GAME ACTIONS ====================
         function farm() {
             if (cooldownActive) return;
-
+            
             // Start cooldown
             cooldownActive = true;
             cooldownEndTime = Date.now() + COOLDOWN_DURATION;
             updateCooldownBar();
-
+            
             // Get eligible plants
             const eligiblePlants = PLANTS.filter(p => p.minHoe <= game.selectedHoeIndex);
             const selectedPlant = eligiblePlants[Math.floor(Math.random() * eligiblePlants.length)];
-
+            
             // Calculate yield
             const yieldAmount = calculateYield();
             const xpGained = calculateXP();
-
+            
             // Consume fertilizer
             if (game.selectedFertilizer !== "none" && game.fertilizers[game.selectedFertilizer] > 0) {
                 const consumption = RARITY_CONSUMPTION[selectedPlant.rarity] || 1;
@@ -1172,16 +1181,16 @@
                 const consumed = Math.min(consumption, available);
                 game.fertilizers[game.selectedFertilizer] -= consumed;
                 stats.totalFertilizerUsed += consumed;
-
+                
                 if (game.fertilizers[game.selectedFertilizer] <= 0) {
                     game.selectedFertilizer = "none";
                 }
             }
-
+            
             // Add to inventory
             game.inventory[selectedPlant.name] = (game.inventory[selectedPlant.name] || 0) + yieldAmount;
             game.xp += xpGained;
-
+            
             // Update stats
             stats.totalFarms++;
             stats.sessionFarms++;
@@ -1194,10 +1203,10 @@
             if (selectedPlant.rarity === "legendary") {
                 stats.legendaryHarvested += yieldAmount;
             }
-
+            
             // Show notification
             showNotification(`${selectedPlant.emoji} Harvested ${yieldAmount} ${selectedPlant.name}!`, selectedPlant.rarity);
-
+            
             checkAchievements();
             saveGame();
             updateAllUI();
@@ -1206,7 +1215,7 @@
         function updateCooldownBar() {
             const bar = document.getElementById('cooldown-bar');
             const btn = document.getElementById('farm-btn');
-
+            
             function update() {
                 const now = Date.now();
                 if (now >= cooldownEndTime) {
@@ -1215,7 +1224,7 @@
                     btn.disabled = false;
                     return;
                 }
-
+                
                 const remaining = cooldownEndTime - now;
                 const percent = (remaining / COOLDOWN_DURATION) * 100;
                 bar.style.width = percent + '%';
@@ -1231,19 +1240,19 @@
                 showNotification("No plants to sell!", "normal");
                 return;
             }
-
+            
             const saleValue = calculateSellPrice();
             game.balance += saleValue;
             stats.totalEarned += saleValue;
             if (saleValue > stats.bestSale) stats.bestSale = saleValue;
-
+            
             // Clear inventory
             for (const plant of PLANTS) {
                 game.inventory[plant.name] = 0;
             }
-
+            
             showNotification(`💰 Sold for ${formatMoney(saleValue)}!`, "achievement");
-
+            
             checkAchievements();
             saveGame();
             updateAllUI();
@@ -1253,14 +1262,14 @@
             const hoe = HOES[index];
             if (game.unlockedHoes.includes(index)) return;
             if (game.balance < hoe.cost) return;
-
+            
             game.balance -= hoe.cost;
             stats.totalSpent += hoe.cost;
             game.unlockedHoes.push(index);
             game.currentHoeIndex = Math.max(game.currentHoeIndex, index);
-
+            
             showNotification(`${hoe.emoji} Unlocked ${hoe.name}!`, "achievement");
-
+            
             checkAchievements();
             saveGame();
             updateAllUI();
@@ -1276,16 +1285,16 @@
         function buyFertilizer(name, amount = 1) {
             const fert = FERTILIZERS.find(f => f.name === name);
             if (!fert) return;
-
+            
             const totalCost = fert.cost * amount;
             if (game.balance < totalCost) return;
-
+            
             game.balance -= totalCost;
             stats.totalSpent += totalCost;
             game.fertilizers[name] = (game.fertilizers[name] || 0) + amount;
-
+            
             showNotification(`${fert.emoji} Bought ${amount}x ${name}!`, "normal");
-
+            
             saveGame();
             updateAllUI();
         }
@@ -1293,19 +1302,19 @@
         function buyUpgrade(id) {
             const upgrade = UPGRADES.find(u => u.id === id);
             if (!upgrade) return;
-
+            
             const currentLevel = game.upgrades[id] || 0;
             if (currentLevel >= upgrade.maxLevel) return;
-
+            
             const cost = getUpgradeCost(upgrade, currentLevel);
             if (game.balance < cost) return;
-
+            
             game.balance -= cost;
             stats.totalSpent += cost;
             game.upgrades[id] = currentLevel + 1;
-
+            
             showNotification(`${upgrade.emoji} ${upgrade.name} → Lv.${currentLevel + 1}!`, "rare");
-
+            
             checkAchievements();
             saveGame();
             updateAllUI();
@@ -1313,10 +1322,10 @@
 
         function prestige() {
             if (!canPrestige()) return;
-
+            
             game.prestigeLevel++;
             game.prestigeBonus = game.prestigeLevel * 2;
-
+            
             // Reset progress
             game.balance = 0;
             game.xp = 0;
@@ -1324,7 +1333,7 @@
             game.selectedHoeIndex = 0;
             game.unlockedHoes = [0];
             game.selectedFertilizer = "none";
-
+            
             for (const fert of FERTILIZERS) {
                 game.fertilizers[fert.name] = 0;
             }
@@ -1334,11 +1343,11 @@
             for (const plant of PLANTS) {
                 game.inventory[plant.name] = 0;
             }
-
+            
             showNotification(`🌟 You've reached prestige ${game.prestigeLevel}! +${game.prestigeBonus}% bonus!`, "legendary");
-
+            
             document.getElementById('prestige-modal').classList.remove('active');
-
+            
             checkAchievements();
             saveGame();
             updateAllUI();
@@ -1380,7 +1389,7 @@
         function updateHoeSelect() {
             const select = document.getElementById('hoe-select');
             select.innerHTML = '';
-
+            
             for (const index of game.unlockedHoes.sort((a, b) => a - b)) {
                 const hoe = HOES[index];
                 const option = document.createElement('option');
@@ -1394,7 +1403,7 @@
         function updateFertilizerSelect() {
             const select = document.getElementById('fertilizer-select');
             select.innerHTML = '<option value="none">No Fertilizer</option>';
-
+            
             for (const fert of FERTILIZERS) {
                 const qty = game.fertilizers[fert.name] || 0;
                 if (qty > 0) {
@@ -1410,7 +1419,7 @@
         function updatePrestigeCard() {
             const card = document.getElementById('prestige-card');
             const desc = document.getElementById('prestige-description');
-
+            
             if (canPrestige()) {
                 card.style.display = 'block';
                 const newBonus = (game.prestigeLevel + 1) * 2;
@@ -1424,13 +1433,13 @@
             // Hoes
             const hoeGrid = document.getElementById('hoe-grid');
             hoeGrid.innerHTML = '';
-
+            
             for (let i = 0; i < HOES.length; i++) {
                 const hoe = HOES[i];
                 const owned = game.unlockedHoes.includes(i);
                 const equipped = game.selectedHoeIndex === i;
                 const canBuy = !owned && game.balance >= hoe.cost;
-
+                
                 const card = document.createElement('div');
                 card.className = `item-card${owned ? ' owned' : ''}${equipped ? ' equipped' : ''}`;
                 card.innerHTML = `
@@ -1439,8 +1448,8 @@
                         <span class="item-price">${hoe.cost === 0 ? 'Free' : formatMoney(hoe.cost)}</span>
                     </div>
                     <div class="item-stats">Multiplier: ${hoe.multiplier}x</div>
-                    ${owned
-                        ? (equipped
+                    ${owned 
+                        ? (equipped 
                             ? '<button class="btn" disabled>Equipped</button>'
                             : `<button class="btn btn-secondary" onclick="equipHoe(${i})">Equip</button>`)
                         : `<button class="btn" ${canBuy ? '' : 'disabled'} onclick="buyHoe(${i})">Buy</button>`
@@ -1448,15 +1457,15 @@
                 `;
                 hoeGrid.appendChild(card);
             }
-
+            
             // Fertilizers
             const fertGrid = document.getElementById('fertilizer-grid');
             fertGrid.innerHTML = '';
-
+            
             for (const fert of FERTILIZERS) {
                 const qty = game.fertilizers[fert.name] || 0;
                 const canBuy = game.balance >= fert.cost;
-
+                
                 const card = document.createElement('div');
                 card.className = 'item-card';
                 card.innerHTML = `
@@ -1478,13 +1487,13 @@
         function updateUpgradesPage() {
             const grid = document.getElementById('upgrade-grid');
             grid.innerHTML = '';
-
+            
             for (const upgrade of UPGRADES) {
                 const level = game.upgrades[upgrade.id] || 0;
                 const maxed = level >= upgrade.maxLevel;
                 const cost = maxed ? 0 : getUpgradeCost(upgrade, level);
                 const canBuy = !maxed && game.balance >= cost;
-
+                
                 const card = document.createElement('div');
                 card.className = `item-card${maxed ? ' owned' : ''}`;
                 card.innerHTML = `
@@ -1496,7 +1505,7 @@
                     <div class="progress-container">
                         <div class="progress-bar" style="width: ${(level / upgrade.maxLevel) * 100}%"></div>
                     </div>
-                    ${maxed
+                    ${maxed 
                         ? '<button class="btn" disabled>Maxed</button>'
                         : `<button class="btn" ${canBuy ? '' : 'disabled'} onclick="buyUpgrade('${upgrade.id}')">${formatMoney(cost)}</button>`
                     }
@@ -1509,17 +1518,17 @@
             const grid = document.getElementById('inventory-grid');
             const sortBy = document.getElementById('sort-select').value;
             const filterBy = document.getElementById('filter-select').value;
-
+            
             let items = PLANTS.map(p => ({
                 ...p,
                 quantity: game.inventory[p.name] || 0
             })).filter(p => p.quantity > 0);
-
+            
             // Filter
             if (filterBy !== 'all') {
                 items = items.filter(p => p.rarity === filterBy);
             }
-
+            
             // Sort
             switch (sortBy) {
                 case 'quantity':
@@ -1534,9 +1543,9 @@
                 default:
                     items.sort((a, b) => a.name.localeCompare(b.name));
             }
-
+            
             grid.innerHTML = '';
-
+            
             if (items.length === 0) {
                 grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.6;">No plants in inventory</p>';
             } else {
@@ -1550,15 +1559,15 @@
                     grid.appendChild(div);
                 }
             }
-
+            
             const totalValue = calculateSellPrice();
-            document.getElementById('inventory-total').textContent =
+            document.getElementById('inventory-total').textContent = 
                 `Total Value: ${formatMoney(totalValue)} (${formatNumber(getTotalPlants())} plants)`;
         }
 
         function updateStatsPage() {
             const grid = document.getElementById('stats-grid');
-
+            
             const statItems = [
                 { label: "Total Farms", value: formatNumber(stats.totalFarms) },
                 { label: "Total Plants Harvested", value: formatNumber(stats.totalPlantsHarvested) },
@@ -1573,7 +1582,7 @@
                 { label: "Current Prestige Level", value: `⭐ ${game.prestigeLevel}` },
                 { label: "Prestige Bonus", value: `+${game.prestigeBonus}%` }
             ];
-
+            
             grid.innerHTML = statItems.map(s => `
                 <div class="stats-card">
                     <div class="value">${s.value}</div>
@@ -1585,10 +1594,10 @@
         function updateAchievementsPage() {
             const grid = document.getElementById('achievement-grid');
             const unlocked = game.achievements.length;
-
-            document.getElementById('achievement-progress').textContent =
+            
+            document.getElementById('achievement-progress').textContent = 
                 `Unlocked: ${unlocked}/${ACHIEVEMENTS.length}`;
-
+            
             grid.innerHTML = ACHIEVEMENTS.map(a => {
                 const isUnlocked = game.achievements.includes(a.id);
                 return `
@@ -1610,39 +1619,39 @@
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
                     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-
+                    
                     btn.classList.add('active');
                     document.getElementById(`page-${btn.dataset.page}`).classList.add('active');
                 });
             });
-
+            
             // Farm button
             document.getElementById('farm-btn').addEventListener('click', farm);
-
+            
             // Sell button
             document.getElementById('sell-btn').addEventListener('click', sellAll);
-
+            
             // Hoe select
             document.getElementById('hoe-select').addEventListener('change', (e) => {
                 equipHoe(parseInt(e.target.value));
             });
-
+            
             // Fertilizer select
             document.getElementById('fertilizer-select').addEventListener('change', (e) => {
                 game.selectedFertilizer = e.target.value;
                 saveGame();
             });
-
+            
             // Inventory sort/filter
             document.getElementById('sort-select').addEventListener('change', updateInventoryPage);
             document.getElementById('filter-select').addEventListener('change', updateInventoryPage);
-
+            
             // Export/Import
             document.getElementById('export-btn').addEventListener('click', () => {
                 const modal = document.getElementById('save-modal');
                 const textarea = document.getElementById('save-textarea');
                 const actionBtn = document.getElementById('modal-action');
-
+                
                 document.getElementById('modal-title').textContent = 'Export Save';
                 textarea.value = exportSave();
                 textarea.readOnly = true;
@@ -1654,12 +1663,12 @@
                 };
                 modal.classList.add('active');
             });
-
+            
             document.getElementById('import-btn').addEventListener('click', () => {
                 const modal = document.getElementById('save-modal');
                 const textarea = document.getElementById('save-textarea');
                 const actionBtn = document.getElementById('modal-action');
-
+                
                 document.getElementById('modal-title').textContent = 'Import Save';
                 textarea.value = '';
                 textarea.readOnly = false;
@@ -1672,29 +1681,29 @@
                 };
                 modal.classList.add('active');
             });
-
+            
             document.getElementById('modal-close').addEventListener('click', () => {
                 document.getElementById('save-modal').classList.remove('active');
             });
-
+            
             // Prestige
             document.getElementById('prestige-btn').addEventListener('click', () => {
                 const newBonus = (game.prestigeLevel + 1) * 2;
-                document.getElementById('prestige-bonus-preview').textContent =
+                document.getElementById('prestige-bonus-preview').textContent = 
                     `You will gain: Prestige Level ${game.prestigeLevel + 1} with +${newBonus}% permanent bonus!`;
                 document.getElementById('prestige-modal').classList.add('active');
             });
-
+            
             document.getElementById('prestige-cancel').addEventListener('click', () => {
                 document.getElementById('prestige-modal').classList.remove('active');
             });
-
+            
             document.getElementById('prestige-confirm').addEventListener('click', prestige);
-
+            
             // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
+                
                 switch (e.code) {
                     case 'Space':
                         e.preventDefault();
@@ -1735,7 +1744,7 @@
             loadGame();
             setupEventListeners();
             updateAllUI();
-
+            
             // Auto-save every 30 seconds
             setInterval(saveGame, 30000);
         }
