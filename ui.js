@@ -162,11 +162,19 @@ function updateShopPage() {
     const hoeGrid = document.getElementById('hoe-grid');
     hoeGrid.innerHTML = '';
 
-    for (let i = 0; i < HOES.length; i++) {
-        const hoe = HOES[i];
+    const sortedHoes = HOES.map((hoe, index) => ({
+        hoe,
+        index,
+        displayCost: getHoeDisplayCost(hoe)
+    })).sort((a, b) => {
+        if (a.displayCost !== b.displayCost) return a.displayCost - b.displayCost;
+        if (a.hoe.cost !== b.hoe.cost) return a.hoe.cost - b.hoe.cost;
+        return a.index - b.index;
+    });
+
+    for (const { hoe, index: i, displayCost } of sortedHoes) {
         const owned = game.unlockedHoes.includes(i);
         const equipped = game.selectedHoeIndex === i;
-        const displayCost = getHoeDisplayCost(hoe);
         const canBuy = !owned && game.balance >= displayCost;
 
         const card = document.createElement('div');
@@ -201,7 +209,13 @@ function updateShopPage() {
     const fertGrid = document.getElementById('fertilizer-grid');
     fertGrid.innerHTML = '';
 
-    for (const fert of FERTILIZERS) {
+    const sortedFertilizers = [...FERTILIZERS].sort((a, b) => {
+        if (a.cost !== b.cost) return a.cost - b.cost;
+        if (a.bonus !== b.bonus) return a.bonus - b.bonus;
+        return a.name.localeCompare(b.name);
+    });
+
+    for (const fert of sortedFertilizers) {
         const qty = game.fertilizers[fert.name] || 0;
         const canBuy = game.balance >= fert.cost;
 

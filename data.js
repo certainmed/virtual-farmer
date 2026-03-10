@@ -1,5 +1,5 @@
 // ==================== DATA DEFINITIONS ====================
-const HOES = [
+const BASE_HOES = [
     { name: "Wooden Hoe", multiplier: 1.0, cost: 0 },
     { name: "Stone Hoe", multiplier: 2.4, cost: 500 },
     { name: "Lapis Hoe", multiplier: 3.7, cost: 1000 },
@@ -28,6 +28,109 @@ const HOES = [
     { name: "Admin Console", multiplier: 12500.0, cost: 45000000000000 },
     { name: "The 'NULL' Pointer", multiplier: 99999.9, cost: 999000000000000 }
 ];
+const NEW_HOES = [
+    { name: "Copper-Tipped Hoe",       multiplier: 148372.4,      cost: 2847361293 },
+    { name: "Tempered Steel Hoe",      multiplier: 193847.7,      cost: 4193847261 },
+    { name: "Bone-Handle Hoe",         multiplier: 127364.2,      cost: 1847362914 },
+    { name: "River Stone Hoe",         multiplier: 284917.5,      cost: 7384912647 },
+    { name: "Hammered Iron Hoe",       multiplier: 163847.9,      cost: 3274819362 },
+    { name: "Forged Bronze Hoe",       multiplier: 347281.3,      cost: 9184736251 },
+    { name: "Charcoal Hoe",            multiplier: 218473.6,      cost: 5473829164 },
+    { name: "Clay-Fired Hoe",          multiplier: 412836.8,      cost: 13847362914 },
+    { name: "Tungsten Hoe",            multiplier: 294817.1,      cost: 8273641928 },
+    { name: "Layered Alloy Hoe",       multiplier: 538294.7,      cost: 19384726183 },
+    { name: "Polished Granite Hoe",    multiplier: 384729.3,      cost: 11473829641 },
+    { name: "Chilled Iron Hoe",        multiplier: 671834.2,      cost: 24817362914 },
+    { name: "Woven Fiber Hoe",         multiplier: 493817.6,      cost: 16284731928 },
+    { name: "Dense Marble Hoe",        multiplier: 824917.3,      cost: 31847362918 },
+    { name: "Sharpened Flint Hoe",     multiplier: 614738.9,      cost: 21473829164 },
+    { name: "Double-Edged Hoe",        multiplier: 1047382.5,     cost: 47384917263 },
+    { name: "Hollow Reed Hoe",         multiplier: 738291.4,      cost: 28374619283 },
+    { name: "Iron-Bone Composite Hoe", multiplier: 1293847.6,     cost: 61847392716 },
+    { name: "Pressed Timber Hoe",      multiplier: 894173.2,      cost: 34817362941 },
+    { name: "Slotted Titanium Hoe",    multiplier: 1583927.4,     cost: 78473619284 },
+    { name: "Midnight Steel Hoe",      multiplier: 1127364.8,     cost: 49283746192 },
+    { name: "Etched Copper Hoe",       multiplier: 1947382.3,     cost: 97384726193 },
+    { name: "Braided Alloy Hoe",       multiplier: 1384729.5,     cost: 63847291638 },
+    { name: "Refined Obsidian Hoe",    multiplier: 2384719.7,     cost: 124738291647 },
+    { name: "Core-Drilled Hoe",        multiplier: 1748392.6,     cost: 84172936481 },
+    { name: "Fractured Crystal Hoe",   multiplier: 2938471.4,     cost: 158473926184 },
+    { name: "Hollow Bone Hoe",         multiplier: 2193847.8,     cost: 107384726193 },
+    { name: "Silver-Inlaid Hoe",       multiplier: 3617284.2,     cost: 197384716293 },
+    { name: "Petrified Wood Hoe",      multiplier: 2748392.5,     cost: 138473926184 },
+    { name: "Magnetic Core Hoe",       multiplier: 4483917.6,     cost: 248392716384 },
+    { name: "Quartz-Tipped Hoe",       multiplier: 3384729.3,     cost: 174839261847 },
+    { name: "Pressure-Cast Hoe",       multiplier: 5572839.1,     cost: 314729163847 },
+    { name: "Layered Carbon Hoe",      multiplier: 4173829.7,     cost: 223847163928 },
+    { name: "Spun Glass Hoe",          multiplier: 6847291.4,     cost: 389274163847 },
+    { name: "Resonant Steel Hoe",      multiplier: 5284917.2,     cost: 284917362847 },
+    { name: "Tempered Jade Hoe",       multiplier: 8391748.6,     cost: 473826194837 },
+    { name: "Hollow Carbon Hoe",       multiplier: 6473829.4,     cost: 358471629384 },
+    { name: "Phase-Treated Hoe",       multiplier: 10284739.3,    cost: 589274163847 },
+    { name: "Crystalline Shaft Hoe",   multiplier: 7938472.1,     cost: 438291764839 },
+    { name: "Compressed Slate Hoe",    multiplier: 12738491.6,    cost: 723847261938 },
+    { name: "Wound Wire Hoe",          multiplier: 9847362.5,     cost: 548273916384 },
+    { name: "Cold-Pressed Hoe",        multiplier: 15847362.8,    cost: 893847261938 },
+    { name: "Stacked Plate Hoe",       multiplier: 12039284.7,    cost: 683741629384 },
+    { name: "Threaded Coil Hoe",       multiplier: 19384726.3,    cost: 1093847261938 },
+    { name: "Engraved Basalt Hoe",     multiplier: 14738291.4,    cost: 847362918473 },
+    { name: "Sealed Chamber Hoe",      multiplier: 23847162.7,    cost: 1384726193847 },
+    { name: "Helical Edge Hoe",        multiplier: 18293746.5,    cost: 1073829164738 },
+    { name: "Solid Iridium Hoe",       multiplier: 29473816.2,    cost: 1748291638472 },
+    { name: "Fracture-Set Hoe",        multiplier: 22847391.8,    cost: 1384917263847 },
+    { name: "Deep-Forged Hoe",         multiplier: 36184729.4,    cost: 2193847261938 },
+    { name: "Lattice Frame Hoe",       multiplier: 28394716.3,    cost: 1738291647382 },
+    { name: "Orbital Ring Hoe",        multiplier: 44738291.6,    cost: 2748361927384 },
+    { name: "Bound Mineral Hoe",       multiplier: 34729163.8,    cost: 2193847362917 },
+    { name: "Vaulted Steel Hoe",       multiplier: 54839271.4,    cost: 3384719263847 },
+    { name: "Micro-Etched Hoe",        multiplier: 43728194.7,    cost: 2748392716384 },
+    { name: "Segmented Alloy Hoe",     multiplier: 67384912.5,    cost: 4193847261938 },
+    { name: "Pulse-Hardened Hoe",      multiplier: 53847291.3,    cost: 3384917263847 },
+    { name: "Grooved Titanium Hoe",    multiplier: 82739164.8,    cost: 5274381629384 },
+    { name: "Cross-Hatched Hoe",       multiplier: 65839271.4,    cost: 4193847362918 },
+    { name: "Tempered Rhodium Hoe",    multiplier: 101384729.6,   cost: 6473829164738 },
+    { name: "Riveted Plate Hoe",       multiplier: 80293746.2,    cost: 5174839261847 },
+    { name: "Vacuum-Cast Hoe",         multiplier: 124738291.5,   cost: 8193847261938 },
+    { name: "Spindle-Core Hoe",        multiplier: 98374162.8,    cost: 6384729163847 },
+    { name: "Arc-Welded Hoe",          multiplier: 153847291.4,   cost: 10274836194738 },
+    { name: "Dense Iridium Hoe",       multiplier: 121384729.3,   cost: 8093847261938 },
+    { name: "Tensioned Wire Hoe",      multiplier: 189473261.7,   cost: 12847362917384 },
+    { name: "Annealed Edge Hoe",       multiplier: 148372916.5,   cost: 9847362918473 },
+    { name: "Coiled Spring Hoe",       multiplier: 232847619.4,   cost: 15738291647382 },
+    { name: "Hollow Sphere Hoe",       multiplier: 183947261.8,   cost: 12384729163847 },
+    { name: "Differential Blade Hoe",  multiplier: 284917362.5,   cost: 19473826194738 },
+    { name: "Sintered Carbide Hoe",    multiplier: 224738192.3,   cost: 15193847261938 },
+    { name: "Stabilized Core Hoe",     multiplier: 347291638.7,   cost: 23847162938471 },
+    { name: "Tapered Alloy Hoe",       multiplier: 274839261.4,   cost: 18384729163847 },
+    { name: "Pressure-Sintered Hoe",   multiplier: 427364819.2,   cost: 29273916384729 },
+    { name: "Fluted Edge Hoe",         multiplier: 338472916.8,   cost: 22384719263847 },
+    { name: "Radial Groove Hoe",       multiplier: 524817362.5,   cost: 35847261938473 },
+    { name: "Laminated Steel Hoe",     multiplier: 413847291.6,   cost: 27384917263847 },
+    { name: "Torsion-Wound Hoe",       multiplier: 643829174.3,   cost: 44193847261938 },
+    { name: "Milled Plate Hoe",        multiplier: 509384726.8,   cost: 33847291638472 },
+    { name: "Impact-Forged Hoe",       multiplier: 789473261.5,   cost: 53847261938471 },
+    { name: "Hardened Zirconium Hoe",  multiplier: 623847192.4,   cost: 41738291647382 },
+    { name: "Composite Lattice Hoe",   multiplier: 968274163.8,   cost: 65738291647382 },
+    { name: "Gradient Alloy Hoe",      multiplier: 763829174.2,   cost: 50947382716384 },
+    { name: "Precision-Ground Hoe",    multiplier: 1193847261.6,  cost: 80473829164738 },
+    { name: "Stiff-Spine Hoe",         multiplier: 938472916.4,   cost: 62384719263847 },
+    { name: "Friction-Welded Hoe",     multiplier: 1473829164.7,  cost: 98473261938472 },
+    { name: "Hollow Tungsten Hoe",     multiplier: 1154738291.3,  cost: 77384916273847 },
+    { name: "Layered Platinum Hoe",    multiplier: 1827364193.5,  cost: 121384729163847 },
+    { name: "Core-Spun Hoe",           multiplier: 1438291647.8,  cost: 95473829164738 },
+    { name: "Micro-Alloy Hoe",         multiplier: 2274819362.4,  cost: 149384726193847 },
+    { name: "Differential Mesh Hoe",   multiplier: 1783924716.6,  cost: 118473829164738 },
+    { name: "Woven Carbide Hoe",       multiplier: 2793846172.8,  cost: 184917362938471 },
+    { name: "Suspended Core Hoe",      multiplier: 2193847261.5,  cost: 143847291638472 },
+    { name: "Reinforced Lattice Hoe",  multiplier: 3427916384.3,  cost: 227384916273847 },
+    { name: "Stratified Steel Hoe",    multiplier: 2684739162.7,  cost: 177384916273847 },
+    { name: "Dense Osmium Hoe",        multiplier: 4193847261.6,  cost: 278473619284736 },
+    { name: "Coaxial Blade Hoe",       multiplier: 3284917362.4,  cost: 218473926184739 },
+    { name: "Fractured Osmium Hoe",    multiplier: 5147382916.8,  cost: 341829164738291 },
+    { name: "Crystallized Iron Hoe",   multiplier: 4038291647.3,  cost: 267384916273847 },
+    { name: "Absolute Forged Hoe",     multiplier: 6293847162.5,  cost: 418473926184738 },
+];
+const HOES = [...BASE_HOES, ...NEW_HOES];
 
 // List of Plant Rarity Levels:
 // 01  common
@@ -323,7 +426,7 @@ const NEW_PLANTS = [
 
 const PLANTS = NEW_PLANTS;
 
-const FERTILIZERS = [
+const BASE_FERTILIZERS = [
     { name: "Mud", bonus: 1, cost: 50 },
     { name: "Soil", bonus: 2, cost: 100 },
     { name: "Compost", bonus: 3, cost: 200 },
@@ -348,6 +451,109 @@ const FERTILIZERS = [
     { name: "Cheat Engine", bonus: 10000000, cost: 8000000000 },
     { name: "Game Master's Blessing", bonus: 50000000, cost: 50000000000 }
 ];
+const NEW_FERTILIZERS = [
+    { name: "Kelp Meal",              bonus: 68,        cost: 1847 },
+    { name: "Wood Ash",               bonus: 42,        cost: 1293 },
+    { name: "Bone Char",              bonus: 57,        cost: 1638 },
+    { name: "Fish Emulsion",          bonus: 83,        cost: 2174 },
+    { name: "Rice Husk",              bonus: 35,        cost: 963 },
+    { name: "Feather Meal",           bonus: 91,        cost: 2483 },
+    { name: "Blood Flour",            bonus: 74,        cost: 1927 },
+    { name: "Peat Blend",             bonus: 118,       cost: 3174 },
+    { name: "Cottonseed Meal",        bonus: 63,        cost: 1748 },
+    { name: "Mineral Grit",           bonus: 147,       cost: 4283 },
+    { name: "Volcanic Pumice",        bonus: 193,       cost: 5847 },
+    { name: "Enzyme Activator",       bonus: 264,       cost: 7384 },
+    { name: "Cold Compost",           bonus: 138,       cost: 3917 },
+    { name: "Trace Mineral Mix",      bonus: 317,       cost: 9173 },
+    { name: "Pressed Algae",          bonus: 218,       cost: 6284 },
+    { name: "Rooted Bark Extract",    bonus: 384,       cost: 11473 },
+    { name: "Sulfur Dust",            bonus: 273,       cost: 7938 },
+    { name: "Molasses Drench",        bonus: 461,       cost: 13847 },
+    { name: "Microbe Inoculant",      bonus: 342,       cost: 9874 },
+    { name: "Silica Powder",          bonus: 538,       cost: 16284 },
+    { name: "Humic Acid",             bonus: 417,       cost: 12473 },
+    { name: "Fulvic Blend",           bonus: 693,       cost: 20384 },
+    { name: "Worm Castings",          bonus: 512,       cost: 15473 },
+    { name: "Biochar Pellet",         bonus: 847,       cost: 24917 },
+    { name: "Liquid Seaweed",         bonus: 634,       cost: 18473 },
+    { name: "Calcium Nitrate",        bonus: 1038,      cost: 30174 },
+    { name: "Fermented Bran",         bonus: 783,       cost: 22847 },
+    { name: "Mycorrhizal Powder",     bonus: 1274,      cost: 37384 },
+    { name: "Potassium Sulfate",      bonus: 947,       cost: 27638 },
+    { name: "Root Stimulant",         bonus: 1583,      cost: 46173 },
+    { name: "Gibberellin Extract",    bonus: 1184,      cost: 34729 },
+    { name: "Cytokinin Drip",         bonus: 1938,      cost: 57384 },
+    { name: "Chelated Iron Mix",      bonus: 1427,      cost: 41847 },
+    { name: "Auxin Spray",            bonus: 2374,      cost: 69173 },
+    { name: "Nitrogen Capsule",       bonus: 1783,      cost: 52384 },
+    { name: "Phosphorus Gel",         bonus: 2917,      cost: 85473 },
+    { name: "Mineral Suspension",     bonus: 2183,      cost: 63847 },
+    { name: "Ionic Booster",          bonus: 3584,      cost: 104738 },
+    { name: "Soil Enzyme Pack",       bonus: 2748,      cost: 80173 },
+    { name: "Growth Catalyst",        bonus: 4293,      cost: 125847 },
+    { name: "Carbon Polymer Feed",    bonus: 3417,      cost: 99384 },
+    { name: "Metabolic Primer",       bonus: 5273,      cost: 153847 },
+    { name: "Bacterial Inoculant",    bonus: 4183,      cost: 121473 },
+    { name: "Peptide Fertilizer",     bonus: 6384,      cost: 186173 },
+    { name: "Amino Acid Complex",     bonus: 5047,      cost: 147382 },
+    { name: "Protein Hydrolysate",    bonus: 7738,      cost: 226847 },
+    { name: "Trichoderma Blend",      bonus: 6193,      cost: 180473 },
+    { name: "Proton-Rich Mineral",    bonus: 9384,      cost: 273847 },
+    { name: "Organic Acid Drench",    bonus: 7438,      cost: 217384 },
+    { name: "Quantum Mineral",        bonus: 11473,     cost: 334817 },
+    { name: "Ion Exchange Pellet",    bonus: 9127,      cost: 266384 },
+    { name: "Cellular Activator",     bonus: 13847,     cost: 404173 },
+    { name: "Membrane Feed",          bonus: 11284,     cost: 328473 },
+    { name: "Photon Soil Charge",     bonus: 16738,     cost: 488291 },
+    { name: "Polymer Root Wrap",      bonus: 13947,     cost: 407384 },
+    { name: "Enzymatic Catalyst",     bonus: 20384,     cost: 594738 },
+    { name: "Density Feed",           bonus: 17293,     cost: 504817 },
+    { name: "Synthetic Humus",        bonus: 24917,     cost: 727384 },
+    { name: "Structured Water Feed",  bonus: 21384,     cost: 624173 },
+    { name: "Particle Suspension",    bonus: 30473,     cost: 889274 },
+    { name: "Pressure-Dissolved Feed",bonus: 26184,     cost: 763847 },
+    { name: "Resonant Mineral",       bonus: 37284,     cost: 1083947 },
+    { name: "Gradient Soil Pack",     bonus: 31847,     cost: 929384 },
+    { name: "Electromagnetic Drip",   bonus: 45738,     cost: 1334817 },
+    { name: "Composite Mineral",      bonus: 38293,     cost: 1117384 },
+    { name: "Phase Soil Activator",   bonus: 56174,     cost: 1638291 },
+    { name: "Lattice Nutrient",       bonus: 47382,     cost: 1382174 },
+    { name: "Deep Core Extract",      bonus: 68473,     cost: 1994738 },
+    { name: "Fused Mineral Blend",    bonus: 57839,     cost: 1687384 },
+    { name: "Crystal Nutrient Gel",   bonus: 83947,     cost: 2447382 },
+    { name: "Thermal Soil Pack",      bonus: 70384,     cost: 2053847 },
+    { name: "Stabilized Mineral",     bonus: 102738,    cost: 2994817 },
+    { name: "Compressed Root Feed",   bonus: 86293,     cost: 2517384 },
+    { name: "Dense Mineral Core",     bonus: 124917,    cost: 3644173 },
+    { name: "Vacuum-Sealed Nutrient", bonus: 104738,    cost: 3053847 },
+    { name: "Pressurized Humus",      bonus: 152384,    cost: 4444817 },
+    { name: "Hardened Soil Matrix",   bonus: 127293,    cost: 3714738 },
+    { name: "Subzero Mineral Drip",   bonus: 185473,    cost: 5413847 },
+    { name: "Reinforced Feed Pack",   bonus: 154917,    cost: 4522384 },
+    { name: "Condensed Root Enzyme",  bonus: 226384,    cost: 6604817 },
+    { name: "Molecular Activator",    bonus: 189738,    cost: 5539173 },
+    { name: "Plasma-Treated Soil",    bonus: 274917,    cost: 8023847 },
+    { name: "Hyper-Dense Feed",       bonus: 231284,    cost: 6752384 },
+    { name: "Core Mineral Injection", bonus: 334738,    cost: 9768291 },
+    { name: "Inverted Root Feed",     bonus: 282193,    cost: 8232174 },
+    { name: "Supercharged Humus",     bonus: 407384,    cost: 11888291 },
+    { name: "Fused Carbon Feed",      bonus: 341847,    cost: 9978473 },
+    { name: "Hyper Enzyme Matrix",    bonus: 497283,    cost: 14512847 },
+    { name: "Refined Core Extract",   bonus: 418293,    cost: 12204738 },
+    { name: "Magnetic Feed",          bonus: 604817,    cost: 17648291 },
+    { name: "Pressured Carbon Gel",   bonus: 508473,    cost: 14833847 },
+    { name: "Stratified Core Feed",   bonus: 737284,    cost: 21513847 },
+    { name: "Layered Mineral Boost",  bonus: 619382,    cost: 18082174 },
+    { name: "Absolute Mineral Feed",  bonus: 893847,    cost: 26088291 },
+    { name: "Fractured Core Drip",    bonus: 748293,    cost: 21848473 },
+    { name: "Dense Synthesis Feed",   bonus: 1083947,   cost: 31651847 },
+    { name: "Concentrated Core Gel",  bonus: 912384,    cost: 26634738 },
+    { name: "Terminal Growth Serum",  bonus: 1317284,   cost: 38468291 },
+    { name: "Apex Mineral Extract",   bonus: 1104817,   cost: 32264738 },
+    { name: "Final Form Feed",        bonus: 1600000,   cost: 46728291 },
+];
+const FERTILIZERS = [...BASE_FERTILIZERS, ...NEW_FERTILIZERS];
 
 // Upgrade categories for UI grouping
 const UPGRADE_CATEGORIES = {
@@ -390,6 +596,39 @@ const UPGRADES = [
     { id: "singularityEngine", name: "Singularity Engine", desc: "Multiplies FINAL yield by 1.1x per level", maxLevel: 10, baseCost: 500000000 }
 ];
 
+const UPGRADE_BY_ID = UPGRADES.reduce((map, upgrade) => {
+    map[upgrade.id] = upgrade;
+    return map;
+}, {});
+
+const ACHIEVEMENT_CHECKS = {
+    totalInventory: (g) => Object.values(g.inventory).reduce((sum, qty) => sum + qty, 0),
+    maxInventoryStack: (g) => Object.values(g.inventory).reduce((max, qty) => Math.max(max, qty), 0),
+    totalUpgradeLevels: (g) => Object.values(g.upgrades).reduce((sum, level) => sum + level, 0),
+    unlockedUpgradeCount: (g) => UPGRADES.reduce((count, upgrade) => count + ((g.upgrades[upgrade.id] || 0) > 0 ? 1 : 0), 0),
+    harvestedByRarity: (s, rarity) => PLANTS.reduce((sum, plant) => {
+        if (plant.rarity !== rarity) return sum;
+        return sum + (s.plantsHarvestedTypes[plant.name] || 0);
+    }, 0),
+    discoveredRarityCount: (s) => {
+        const discovered = new Set();
+        for (const plant of PLANTS) {
+            if ((s.plantsHarvestedTypes[plant.name] || 0) > 0) {
+                discovered.add(plant.rarity);
+            }
+        }
+        return discovered.size;
+    },
+    maxedCategory: (g, categoryId) => {
+        const category = UPGRADE_CATEGORIES[categoryId];
+        if (!category || !Array.isArray(category.ids)) return false;
+        return category.ids.every(id => {
+            const upgrade = UPGRADE_BY_ID[id];
+            return upgrade && (g.upgrades[id] || 0) >= upgrade.maxLevel;
+        });
+    }
+};
+
 const ACHIEVEMENTS = [
     { id: "firstSteps", name: "First Steps", desc: "Harvest your first plant", icon: "1", check: (g, s) => s.totalFarms >= 1 },
     { id: "businessman", name: "Businessman", desc: "Earn $10,000 in a single sale", icon: "$", check: (g, s) => s.bestSale >= 10000 },
@@ -404,11 +643,59 @@ const ACHIEVEMENTS = [
     { id: "fertilzerFanatic", name: "Fertilizer Fanatic", desc: "Use 1,000 fertilizer units", icon: "F", check: (g, s) => s.totalFertilizerUsed >= 1000 },
     { id: "speedRunner", name: "Speed Runner", desc: "Perform 100 farms in one session", icon: "S", check: (g, s) => s.sessionFarms >= 100 },
     { id: "richFarmer", name: "Rich Farmer", desc: "Have $50,000 balance at once", icon: "R", check: (g) => g.balance >= 50000 },
-    { id: "upgradeAddict", name: "Upgrade Addict", desc: "Purchase 50 total upgrade levels", icon: "U", check: (g) => Object.values(g.upgrades).reduce((a, b) => a + b, 0) >= 50 },
+    { id: "upgradeAddict", name: "Upgrade Addict", desc: "Purchase 50 total upgrade levels", icon: "U", check: (g) => ACHIEVEMENT_CHECKS.totalUpgradeLevels(g) >= 50 },
     { id: "completionist", name: "Completionist", desc: "Max all upgrades", icon: "X", check: (g) => UPGRADES.every(u => g.upgrades[u.id] >= u.maxLevel) },
     { id: "legendaryFarmer", name: "Legendary Farmer", desc: "Harvest 100 Legendary plants", icon: "D", check: (g, s) => s.legendaryHarvested >= 100 },
     { id: "billionaire", name: "Billionaire", desc: "Reach 1 Billion balance", icon: "B", check: (g) => g.balance >= 1000000000 },
-    { id: "prestigeMaster", name: "Prestige Master", desc: "Reach Prestige level 10", icon: "K", check: (g) => g.prestigeLevel >= 10 }
+    { id: "prestigeMaster", name: "Prestige Master", desc: "Reach Prestige level 10", icon: "K", check: (g) => g.prestigeLevel >= 10 },
+
+    // Session and scale
+    { id: "marathonFarmer", name: "Marathon Farmer", desc: "Perform 1,000 farms in one session", icon: "H", check: (g, s) => s.sessionFarms >= 1000 },
+    { id: "noDaysOff", name: "No Days Off", desc: "Reach 100,000 total farms", icon: "N", check: (g, s) => s.totalFarms >= 100000 },
+    { id: "planetFeeder", name: "Planet Feeder", desc: "Harvest 1,000,000 total plants", icon: "Q", check: (g, s) => s.totalPlantsHarvested >= 1000000 },
+    { id: "biosphereBuilder", name: "Biosphere Builder", desc: "Harvest 100,000,000 total plants", icon: "Y", check: (g, s) => s.totalPlantsHarvested >= 100000000 },
+
+    // Inventory and fertilizer strategy
+    { id: "warehouseTycoon", name: "Warehouse Tycoon", desc: "Hold 1,000,000 plants in inventory at once", icon: "W", check: (g) => ACHIEVEMENT_CHECKS.totalInventory(g) >= 1000000 },
+    { id: "monocropMagnate", name: "Monocrop Magnate", desc: "Stockpile 250,000 of a single plant", icon: "O", check: (g) => ACHIEVEMENT_CHECKS.maxInventoryStack(g) >= 250000 },
+    { id: "fertilizerRainbow", name: "Fertilizer Rainbow", desc: "Own at least 1 of every fertilizer at once", icon: "J", check: (g) => FERTILIZERS.every(f => (g.fertilizers[f.name] || 0) > 0) },
+    { id: "fertilizerSilo", name: "Fertilizer Silo", desc: "Own 100,000 units of any fertilizer", icon: "Z", check: (g) => FERTILIZERS.some(f => (g.fertilizers[f.name] || 0) >= 100000) },
+
+    // Money and market mastery
+    { id: "sixFigureFlip", name: "Six Figure Flip", desc: "Earn $100,000 in a single sale", icon: "6", check: (g, s) => s.bestSale >= 100000 },
+    { id: "nineFigureFlip", name: "Nine Figure Flip", desc: "Earn $100,000,000 in a single sale", icon: "9", check: (g, s) => s.bestSale >= 100000000 },
+    { id: "trillionTrade", name: "Trillion Trade", desc: "Earn $1,000,000,000,000 in a single sale", icon: "T", check: (g, s) => s.bestSale >= 1000000000000 },
+    { id: "seedCapital", name: "Seed Capital", desc: "Earn $100,000,000 total", icon: "A", check: (g, s) => s.totalEarned >= 100000000 },
+    { id: "agriConglomerate", name: "Agri Conglomerate", desc: "Earn $10,000,000,000 total", icon: "G", check: (g, s) => s.totalEarned >= 10000000000 },
+    { id: "ventureSpender", name: "Venture Spender", desc: "Spend $100,000,000 total", icon: "V", check: (g, s) => s.totalSpent >= 100000000 },
+    { id: "blackHoleBudget", name: "Black Hole Budget", desc: "Spend $10,000,000,000 total", icon: "C", check: (g, s) => s.totalSpent >= 10000000000 },
+    { id: "profitEngine", name: "Profit Engine", desc: "Maintain at least a 5x lifetime earn-to-spend ratio", icon: "P", check: (g, s) => s.totalSpent >= 1000000 && s.totalEarned >= (s.totalSpent * 5) },
+    { id: "reserveKing", name: "Reserve King", desc: "Hold $1,000,000,000,000 balance at once", icon: "R", check: (g) => g.balance >= 1000000000000 },
+    { id: "realityBank", name: "Reality Bank", desc: "Hold $1,000,000,000,000,000 balance at once", icon: "I", check: (g) => g.balance >= 1000000000000000 },
+
+    // Yield and XP
+    { id: "overclockedHarvest", name: "Overclocked Harvest", desc: "Reach 10,000 yield in one harvest", icon: "K", check: (g, s) => s.bestYield >= 10000 },
+    { id: "singularYield", name: "Singular Yield", desc: "Reach 1,000,000 yield in one harvest", icon: "S", check: (g, s) => s.bestYield >= 1000000 },
+    { id: "phdFarmer", name: "PhD in Photosynthesis", desc: "Reach 1,000,000 XP in one run", icon: "D", check: (g) => g.xp >= 1000000 },
+    { id: "overflowFarmer", name: "Overflow Farmer", desc: "Reach 1,000,000,000 XP in one run", icon: "F", check: (g) => g.xp >= 1000000000 },
+
+    // Tool and rarity progression
+    { id: "arsenal15", name: "Field Arsenal I", desc: "Unlock 15 hoes", icon: "1", check: (g) => g.unlockedHoes.length >= 15 },
+    { id: "arsenal25", name: "Field Arsenal II", desc: "Unlock 25 hoes", icon: "2", check: (g) => g.unlockedHoes.length >= 25 },
+    { id: "nullPointerUnlocked", name: "Null Pointer Acquired", desc: "Unlock The 'NULL' Pointer", icon: "0", check: (g) => {
+        const nullPointerIndex = HOES.findIndex(h => h.name === "The 'NULL' Pointer");
+        return nullPointerIndex >= 0 && g.unlockedHoes.includes(nullPointerIndex);
+    } },
+    { id: "rarityGrandTour", name: "Rarity Grand Tour", desc: `Harvest at least one plant from all ${PLANT_RARITY_LEVELS.length} rarity tiers`, icon: "L", check: (g, s) => ACHIEVEMENT_CHECKS.discoveredRarityCount(s) >= PLANT_RARITY_LEVELS.length },
+    { id: "divineGardener", name: "Divine Gardener", desc: "Harvest 1,000,000 Divine plants", icon: "E", check: (g, s) => ACHIEVEMENT_CHECKS.harvestedByRarity(s, "divine") >= 1000000 },
+    { id: "nullCultivator", name: "Null Cultivator", desc: "Harvest 5,000,000 Null plants", icon: "U", check: (g, s) => ACHIEVEMENT_CHECKS.harvestedByRarity(s, "null") >= 5000000 },
+
+    // Upgrade specialization and long-run mastery
+    { id: "utilityVirtuoso", name: "Utility Virtuoso", desc: "Max all Efficiency & Utility upgrades", icon: "B", check: (g) => ACHIEVEMENT_CHECKS.maxedCategory(g, "efficiency") },
+    { id: "anomalyVirtuoso", name: "Anomaly Virtuoso", desc: "Max all Anomaly & Sci-Fi upgrades", icon: "M", check: (g) => ACHIEVEMENT_CHECKS.maxedCategory(g, "scifi") },
+    { id: "buildCrafter", name: "Build Crafter", desc: "Buy at least 1 level in 20 different upgrades", icon: "X", check: (g) => ACHIEVEMENT_CHECKS.unlockedUpgradeCount(g) >= 20 },
+    { id: "levelStacker", name: "Level Stacker", desc: "Purchase 120 total upgrade levels", icon: "+", check: (g) => ACHIEVEMENT_CHECKS.totalUpgradeLevels(g) >= 120 },
+    { id: "prestigeXXV", name: "Prestige XXV", desc: "Reach Prestige level 25", icon: "5", check: (g) => g.prestigeLevel >= 25 }
 ];
 
 const RARITY_CONSUMPTION = {
@@ -447,3 +734,5 @@ const RARITY_ORDER = {
 };
 const COOLDOWN_DURATION = 1500;
 const MAX_NOTIFICATIONS = 5;
+
+
