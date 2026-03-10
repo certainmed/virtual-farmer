@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Farm Simulator - harvest plants, upgrade your tools, and prestige your way to farming mastery.">
+    <title>Farm Simulator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header class="topbar glass-panel">
+        <h1>Farm Simulator</h1>
+        <nav>
+            <button class="nav-btn active" data-page="main">Main</button>
+            <button class="nav-btn" data-page="shop">Shop</button>
+            <button class="nav-btn" data-page="upgrades">Upgrades</button>
+            <button class="nav-btn" data-page="inventory">Inventory</button>
+            <button class="nav-btn" data-page="stats">Stats</button>
+            <button class="nav-btn" data-page="achievements">Achievements</button>
+        </nav>
+    </header>
+
+    <div class="stats-bar glass-panel">
+        <div class="stat-item">
+            <span class="stat-label">Balance</span>
+            <span class="stat-value" id="balance-display">$0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">XP</span>
+            <span class="stat-value" id="xp-display">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Plants</span>
+            <span class="stat-value" id="plants-display">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Current Hoe</span>
+            <span class="stat-value" id="hoe-display">Wooden Hoe</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Prestige</span>
+            <span class="stat-value" id="prestige-display">Lv. 0</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="notification-container" id="notifications"></div>
+
+        <div class="page active" id="page-main">
+            <div class="main-dashboard">
+                <section class="card hero-panel farm-hero">
+                    <h2>Farm</h2>
+                    <div class="farm-section">
+                        <div class="farm-controls">
+                            <select id="hoe-select" aria-label="Select hoe"></select>
+                            <select id="fertilizer-select" aria-label="Select fertilizer">
+                                <option value="none">No Fertilizer</option>
+                            </select>
+                        </div>
+                        <button class="btn farm-btn-lg" id="farm-btn">
+                            Farm
+                            <div class="cooldown-bar" id="cooldown-bar"></div>
+                        </button>
+                        <p class="keyboard-hint">Press [Space] to farm</p>
+                        <button class="btn btn-secondary sell-btn-wide" id="sell-btn">Sell All Plants</button>
+                        <p class="keyboard-hint">Press [S] to sell</p>
+                    </div>
+                </section>
+
+                <section class="card glass-panel auto-panel">
+                    <h2>Auto Farm</h2>
+                    <div class="auto-farm-layout">
+                        <div class="auto-farm-left">
+                            <p class="auto-farm-desc">
+                                Automatically harvests 6 times per second in the background. Silent mode only shows
+                                Legendary+ notifications. Manual farming gives full yield; auto-farm gives 30% yield.
+                            </p>
+                            <div class="auto-farm-controls">
+                                <button class="btn auto-farm-btn" id="auto-farm-toggle">Enable Auto Farm</button>
+                                <span class="auto-farm-status status-pill" id="auto-farm-status">Inactive</span>
+                            </div>
+                            <p class="keyboard-hint">Press [A] to toggle</p>
+                        </div>
+                        <div class="auto-farm-right" id="auto-farm-preview">
+                            <div class="auto-farm-preview-label">Auto Farm Results</div>
+                            <div class="auto-farm-preview-grid" id="auto-farm-stats"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card glass-panel save-panel">
+                    <h2>Save Management</h2>
+                    <div class="save-actions">
+                        <button class="btn btn-secondary" id="export-btn">Export Save</button>
+                        <button class="btn btn-secondary" id="import-btn">Import Save</button>
+                    </div>
+                </section>
+
+                <section class="card prestige-info floating-panel" id="prestige-card">
+                    <h3>Prestige Available</h3>
+                    <p id="prestige-description"></p>
+                    <button class="btn btn-prestige prestige-cta" id="prestige-btn">Prestige Now</button>
+                </section>
+            </div>
+        </div>
+
+        <div class="page" id="page-shop">
+            <section class="card glass-panel">
+                <h2>Hoe Shop</h2>
+                <div class="grid" id="hoe-grid"></div>
+            </section>
+
+            <section class="card glass-panel">
+                <h2>Fertilizer Shop</h2>
+                <div class="grid" id="fertilizer-grid"></div>
+            </section>
+        </div>
+
+        <div class="page" id="page-upgrades">
+            <section class="card glass-panel">
+                <h2>Upgrades</h2>
+                <p class="helper-note">Costs increase exponentially: Base x 5.15^Level</p>
+                <div class="grid" id="upgrade-grid"></div>
+            </section>
+        </div>
+
+        <div class="page" id="page-inventory">
+            <section class="card glass-panel">
+                <h2>Inventory</h2>
+                <div class="inventory-controls">
+                    <select id="sort-select" aria-label="Sort inventory">
+                        <option value="name">Sort by Name</option>
+                        <option value="quantity">Sort by Quantity</option>
+                        <option value="value">Sort by Value</option>
+                        <option value="rarity">Sort by Rarity</option>
+                    </select>
+                    <select id="filter-select" aria-label="Filter inventory by rarity">
+                        <option value="all">All Rarities</option>
+                        <option value="common">Common</option>
+                        <option value="uncommon">Uncommon</option>
+                        <option value="rare">Rare</option>
+                        <option value="epic">Epic</option>
+                        <option value="legendary">Legendary</option>
+                        <option value="mythic">Mythic</option>
+                        <option value="ancient">Ancient</option>
+                        <option value="celestial">Celestial</option>
+                        <option value="eldritch">Eldritch</option>
+                        <option value="eternal">Eternal</option>
+                        <option value="divine">Divine</option>
+                        <option value="cosmic">Cosmic</option>
+                        <option value="primordial">Primordial</option>
+                        <option value="singularity">Singularity</option>
+                        <option value="null">Null</option>
+                    </select>
+                </div>
+                <div class="inventory-grid" id="inventory-grid"></div>
+                <p id="inventory-total" class="inventory-total"></p>
+            </section>
+        </div>
+
+        <div class="page" id="page-stats">
+            <section class="card glass-panel">
+                <h2>Statistics</h2>
+                <div class="stats-grid" id="stats-grid"></div>
+            </section>
+        </div>
+
+        <div class="page" id="page-achievements">
+            <section class="card glass-panel">
+                <h2>Achievements</h2>
+                <p class="helper-note" id="achievement-progress"></p>
+                <div class="grid" id="achievement-grid"></div>
+            </section>
+        </div>
+    </div>
+
+    <div class="modal" id="save-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+        <div class="modal-content glass-panel" tabindex="-1">
+            <h2 id="modal-title">Export Save</h2>
+            <textarea id="save-textarea" placeholder="Your save code will appear here..."></textarea>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="modal-close">Close</button>
+                <button class="btn" id="modal-action">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="prestige-modal" role="dialog" aria-modal="true" aria-labelledby="prestige-modal-title"
+        aria-describedby="prestige-modal-desc" aria-hidden="true">
+        <div class="modal-content glass-panel" tabindex="-1">
+            <h2 id="prestige-modal-title">Confirm Prestige</h2>
+            <p id="prestige-modal-desc" class="modal-copy">
+                Are you sure you want to prestige? You will lose all your progress but gain permanent bonuses.
+            </p>
+            <p id="prestige-bonus-preview" class="modal-highlight"></p>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="prestige-cancel">Cancel</button>
+                <button class="btn btn-prestige" id="prestige-confirm">Prestige!</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js?v=20260310c"></script>
+    <script src="game.js?v=20260310c"></script>
+    <script src="ui.js?v=20260310c"></script>
+</body>
+
+</html>
+
