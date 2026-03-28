@@ -38,6 +38,21 @@
         };
     }
 
+    function createUnavailableException(error) {
+        const unavailableError = createUnavailableError();
+        if (error) unavailableError.cause = error;
+        return unavailableError;
+    }
+
+    function handleUnavailableException(error) {
+        client = null;
+        setActiveUser(null);
+        if (isHostedStaticBuild()) {
+            clearStoredConfig();
+        }
+        throw createUnavailableException(error);
+    }
+
     function trimTrailingSlash(value) {
         return value.replace(/\/+$/, "");
     }
@@ -271,15 +286,25 @@
         const fallback = String(email || "").includes("@") ? String(email).split("@")[0] : "Farmer";
         const safeName = sanitizeDisplayName(displayName, fallback || "Farmer");
 
-        const { data, error } = await supabaseClient.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    display_name: safeName
+        let authResult;
+        try {
+            authResult = await supabaseClient.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        display_name: safeName
+                    }
                 }
+            });
+        } catch (error) {
+            if (isNetworkFailure(error)) {
+                handleUnavailableException(error);
             }
-        });
+            throw error;
+        }
+
+        const { data, error } = authResult;
 
         if (error) throw error;
 
@@ -298,7 +323,17 @@
 
     async function signIn({ email, password }) {
         const supabaseClient = getClientOrThrow();
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        let authResult;
+        try {
+            authResult = await supabaseClient.auth.signInWithPassword({ email, password });
+        } catch (error) {
+            if (isNetworkFailure(error)) {
+                handleUnavailableException(error);
+            }
+            throw error;
+        }
+
+        const { data, error } = authResult;
         if (error) throw error;
 
         setActiveUser(data.user || null);

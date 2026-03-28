@@ -181,6 +181,14 @@
         });
     }
 
+    function lockFormsForUnavailableCloud(message) {
+        setStatus(
+            message || "Cloud authentication is unavailable. You can still use local mode from game.html.",
+            "error"
+        );
+        setAuthFormsDisabled(true);
+    }
+
     async function initialize() {
         const supabaseApi = window.VirtualFarmerSupabase;
 
@@ -201,8 +209,7 @@
 
         const initResult = await supabaseApi.init();
         if (initResult?.unavailable) {
-            setStatus(initResult.error?.message || "Cloud authentication is unavailable. You can still use local mode from game.html.", "error");
-            setAuthFormsDisabled(true);
+            lockFormsForUnavailableCloud(initResult.error?.message);
             return;
         }
 
@@ -269,6 +276,10 @@
                 setStatus("Signed in. Redirecting...", "success");
                 window.location.href = nextTarget;
             } catch (error) {
+                if (/Cloud services are currently unreachable/i.test(String(error?.message || ""))) {
+                    lockFormsForUnavailableCloud(error.message);
+                    return;
+                }
                 setStatus(error?.message || "Login failed.", "error");
             } finally {
                 syncLoginSubmitState();
@@ -364,6 +375,10 @@
                     "success"
                 );
             } catch (error) {
+                if (/Cloud services are currently unreachable/i.test(String(error?.message || ""))) {
+                    lockFormsForUnavailableCloud(error.message);
+                    return;
+                }
                 setStatus(error?.message || "Sign-up failed.", "error");
             } finally {
                 syncSignupSubmitState();
