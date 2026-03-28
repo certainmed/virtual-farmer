@@ -57,16 +57,32 @@
         }
     }
 
+    function clearStoredConfig() {
+        try {
+            localStorage.removeItem(STORAGE_CONFIG_KEY);
+        } catch {
+            // Ignore storage cleanup failures.
+        }
+    }
+
+    function isHostedStaticBuild() {
+        return /\.github\.io$/i.test(window.location.hostname);
+    }
+
     function readConfig() {
         const fromWindow = window.__SUPABASE_CONFIG__ && typeof window.__SUPABASE_CONFIG__ === "object"
             ? window.__SUPABASE_CONFIG__
             : {};
-        const fromStorage = readStoredConfig();
+        const fromStorage = isHostedStaticBuild() ? {} : readStoredConfig();
 
         const rawUrl = String(fromWindow.url || fromStorage.url || "").trim();
         const rawAnonKey = String(fromWindow.anonKey || fromStorage.anonKey || "").trim();
         const url = isPlaceholder(rawUrl) ? "" : rawUrl;
         const anonKey = isPlaceholder(rawAnonKey) ? "" : rawAnonKey;
+
+        if (!url || !anonKey) {
+            clearStoredConfig();
+        }
 
         return {
             url: url ? trimTrailingSlash(url) : "",
