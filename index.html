@@ -1,217 +1,148 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Farm Simulator - harvest plants, upgrade your tools, and prestige your way to farming mastery.">
-    <title>Farm Simulator</title>
+        content="Virtual Farmer is a high-voltage browser farming game with cloud saves, leaderboards, prestige loops, and a fast progression system.">
+    <title>Virtual Farmer | The Orchard Exchange</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Monoton&family=Azeret+Mono:wght@400;500;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="promo.css?v=20260314a">
 </head>
 
-<body>
-    <header class="topbar glass-panel">
-        <h1>Farm Simulator</h1>
-        <nav>
-            <button class="nav-btn active" data-page="main">Main</button>
-            <button class="nav-btn" data-page="shop">Shop</button>
-            <button class="nav-btn" data-page="upgrades">Upgrades</button>
-            <button class="nav-btn" data-page="inventory">Inventory</button>
-            <button class="nav-btn" data-page="stats">Stats</button>
-            <button class="nav-btn" data-page="achievements">Achievements</button>
+<body data-scroll-direction="down" data-auth-state="checking">
+    <div class="promo-atmosphere" aria-hidden="true"></div>
+
+    <header class="promo-topbar">
+        <a class="promo-brand" href="index.html" aria-label="Virtual Farmer home">
+            <span class="promo-brand-mark">VF</span>
+            <span class="promo-brand-name">Virtual Farmer</span>
+        </a>
+        <nav class="promo-actions" aria-label="Authentication actions">
+            <a id="promo-login-link" class="promo-btn promo-btn-ghost" href="login.html?next=game.html">Log In</a>
+            <a id="promo-signup-link" class="promo-btn promo-btn-solid" href="signup.html?next=game.html">Create Account</a>
         </nav>
     </header>
 
-    <div class="stats-bar glass-panel">
-        <div class="stat-item">
-            <span class="stat-label">Balance</span>
-            <span class="stat-value" id="balance-display">$0</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-label">XP</span>
-            <span class="stat-value" id="xp-display">0</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-label">Plants</span>
-            <span class="stat-value" id="plants-display">0</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-label">Current Hoe</span>
-            <span class="stat-value" id="hoe-display">Wooden Hoe</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-label">Prestige</span>
-            <span class="stat-value" id="prestige-display">Lv. 0</span>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="notification-container" id="notifications"></div>
-
-        <div class="page active" id="page-main">
-            <div class="main-dashboard">
-                <section class="card hero-panel farm-hero">
-                    <h2>Farm</h2>
-                    <div class="farm-section">
-                        <div class="farm-controls">
-                            <select id="hoe-select" aria-label="Select hoe"></select>
-                            <select id="fertilizer-select" aria-label="Select fertilizer">
-                                <option value="none">No Fertilizer</option>
-                            </select>
-                        </div>
-                        <button class="btn farm-btn-lg" id="farm-btn">
-                            Farm
-                            <div class="cooldown-bar" id="cooldown-bar"></div>
-                        </button>
-                        <p class="keyboard-hint">Press [Space] to farm</p>
-                        <button class="btn btn-secondary sell-btn-wide" id="sell-btn">Sell All Plants</button>
-                        <p class="keyboard-hint">Press [S] to sell</p>
-                    </div>
-                </section>
-
-                <section class="card glass-panel auto-panel">
-                    <h2>Auto Farm</h2>
-                    <div class="auto-farm-layout">
-                        <div class="auto-farm-left">
-                            <p class="auto-farm-desc">
-                                Automatically harvests 6 times per second in the background. Silent mode only shows
-                                Legendary+ notifications. Manual farming gives full yield; auto-farm gives 30% yield.
-                            </p>
-                            <div class="auto-farm-controls">
-                                <button class="btn auto-farm-btn" id="auto-farm-toggle">Enable Auto Farm</button>
-                                <span class="auto-farm-status status-pill" id="auto-farm-status">Inactive</span>
-                            </div>
-                            <p class="keyboard-hint">Press [A] to toggle</p>
-                        </div>
-                        <div class="auto-farm-right" id="auto-farm-preview">
-                            <div class="auto-farm-preview-label">Auto Farm Results</div>
-                            <div class="auto-farm-preview-grid" id="auto-farm-stats"></div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="card glass-panel save-panel">
-                    <h2>Save Management</h2>
-                    <div class="save-actions">
-                        <button class="btn btn-secondary" id="export-btn">Export Save</button>
-                        <button class="btn btn-secondary" id="import-btn">Import Save</button>
-                    </div>
-                </section>
-
-                <section class="card prestige-info floating-panel" id="prestige-card">
-                    <h3>Prestige Available</h3>
-                    <p id="prestige-description"></p>
-                    <button class="btn btn-prestige prestige-cta" id="prestige-btn">Prestige Now</button>
-                </section>
-            </div>
-        </div>
-
-        <div class="page" id="page-shop">
-            <section class="card glass-panel">
-                <h2>Hoe Shop</h2>
-                <div class="grid" id="hoe-grid"></div>
-            </section>
-
-            <section class="card glass-panel">
-                <h2>Fertilizer Shop</h2>
-                <div class="grid" id="fertilizer-grid"></div>
-            </section>
-        </div>
-
-        <div class="page" id="page-upgrades">
-            <section class="card glass-panel">
-                <h2>Upgrades</h2>
-                <p class="helper-note">Costs increase exponentially: Base x 5.15^Level</p>
-                <div class="grid" id="upgrade-grid"></div>
-            </section>
-        </div>
-
-        <div class="page" id="page-inventory">
-            <section class="card glass-panel">
-                <h2>Inventory</h2>
-                <div class="inventory-controls">
-                    <select id="sort-select" aria-label="Sort inventory">
-                        <option value="name">Sort by Name</option>
-                        <option value="quantity">Sort by Quantity</option>
-                        <option value="value">Sort by Value</option>
-                        <option value="rarity">Sort by Rarity</option>
-                    </select>
-                    <select id="filter-select" aria-label="Filter inventory by rarity">
-                        <option value="all">All Rarities</option>
-                        <option value="common">Common</option>
-                        <option value="uncommon">Uncommon</option>
-                        <option value="rare">Rare</option>
-                        <option value="epic">Epic</option>
-                        <option value="legendary">Legendary</option>
-                        <option value="mythic">Mythic</option>
-                        <option value="ancient">Ancient</option>
-                        <option value="celestial">Celestial</option>
-                        <option value="eldritch">Eldritch</option>
-                        <option value="eternal">Eternal</option>
-                        <option value="divine">Divine</option>
-                        <option value="cosmic">Cosmic</option>
-                        <option value="primordial">Primordial</option>
-                        <option value="singularity">Singularity</option>
-                        <option value="null">Null</option>
-                    </select>
+    <main>
+        <section class="hero" data-reveal style="--reveal-delay: 0ms;">
+            <div class="hero-copy">
+                <p class="hero-kicker">Orchard Exchange Broadcast</p>
+                <h1>Grow a farm that moves like a trading floor.</h1>
+                <p class="hero-lede">
+                    Virtual Farmer turns every harvest into a strategic run. Upgrade tools, stack multipliers,
+                    trigger rare drops, then race up live leaderboards.
+                </p>
+                <div class="hero-cta-row">
+                    <a class="promo-btn promo-btn-solid" href="signup.html?next=game.html">Start New Farm</a>
+                    <a class="promo-btn promo-btn-ghost" href="login.html?next=game.html">Return to My Farm</a>
                 </div>
-                <div class="inventory-grid" id="inventory-grid"></div>
-                <p id="inventory-total" class="inventory-total"></p>
-            </section>
-        </div>
-
-        <div class="page" id="page-stats">
-            <section class="card glass-panel">
-                <h2>Statistics</h2>
-                <div class="stats-grid" id="stats-grid"></div>
-            </section>
-        </div>
-
-        <div class="page" id="page-achievements">
-            <section class="card glass-panel">
-                <h2>Achievements</h2>
-                <p class="helper-note" id="achievement-progress"></p>
-                <div class="grid" id="achievement-grid"></div>
-            </section>
-        </div>
-    </div>
-
-    <div class="modal" id="save-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
-        <div class="modal-content glass-panel" tabindex="-1">
-            <h2 id="modal-title">Export Save</h2>
-            <textarea id="save-textarea" placeholder="Your save code will appear here..."></textarea>
-            <div class="modal-buttons">
-                <button class="btn btn-secondary" id="modal-close">Close</button>
-                <button class="btn" id="modal-action">Copy</button>
+                <p class="hero-auth-note" id="promo-auth-status" aria-live="polite">Checking account access...</p>
             </div>
-        </div>
-    </div>
 
-    <div class="modal" id="prestige-modal" role="dialog" aria-modal="true" aria-labelledby="prestige-modal-title"
-        aria-describedby="prestige-modal-desc" aria-hidden="true">
-        <div class="modal-content glass-panel" tabindex="-1">
-            <h2 id="prestige-modal-title">Confirm Prestige</h2>
-            <p id="prestige-modal-desc" class="modal-copy">
-                Are you sure you want to prestige? You will lose all your progress but gain permanent bonuses.
-            </p>
-            <p id="prestige-bonus-preview" class="modal-highlight"></p>
-            <div class="modal-buttons">
-                <button class="btn btn-secondary" id="prestige-cancel">Cancel</button>
-                <button class="btn btn-prestige" id="prestige-confirm">Prestige!</button>
+            <aside class="hero-board" data-reveal style="--reveal-delay: 120ms;">
+                <h2>Why people stay up too late playing</h2>
+                <ul>
+                    <li>
+                        <strong data-counter="6">6</strong>
+                        <span>auto-farm harvest cycles every second once unlocked</span>
+                    </li>
+                    <li>
+                        <strong data-counter="15">15</strong>
+                        <span>plant rarity tiers from common up to singularity</span>
+                    </li>
+                    <li>
+                        <strong data-counter="100">100</strong>
+                        <span>percent cloud-backed progress from first upgrade onward</span>
+                    </li>
+                </ul>
+            </aside>
+        </section>
+
+        <section class="feature-grid">
+            <article class="feature-card" data-reveal style="--reveal-delay: 60ms;">
+                <p class="feature-index">01</p>
+                <h3>Progress that compounds fast</h3>
+                <p>Prestige loops, upgrade synergies, and fertilizer strategy make each session stronger than the last.</p>
+            </article>
+
+            <article class="feature-card" data-reveal style="--reveal-delay: 120ms;">
+                <p class="feature-index">02</p>
+                <h3>Cloud sync that follows you</h3>
+                <p>Your balance, inventory, upgrades, achievements, and stats stay attached to your account.</p>
+            </article>
+
+            <article class="feature-card" data-reveal style="--reveal-delay: 180ms;">
+                <p class="feature-index">03</p>
+                <h3>Leaderboards with real pressure</h3>
+                <p>Compete on total plants, highest balance, and XP with live refresh inside the game.</p>
+            </article>
+        </section>
+
+        <section class="story" id="inside-loop">
+            <div class="story-head" data-reveal>
+                <p class="hero-kicker">Inside The Loop</p>
+                <h2>One session, start to finish</h2>
             </div>
-        </div>
-    </div>
+            <ol class="story-steps">
+                <li class="story-step" data-reveal style="--reveal-delay: 50ms;">
+                    <span class="step-number">1</span>
+                    <div>
+                        <h3>Harvest</h3>
+                        <p>Pick your hoe, choose fertilizer, and trigger rapid farm cycles for high-yield drops.</p>
+                    </div>
+                </li>
+                <li class="story-step" data-reveal style="--reveal-delay: 100ms;">
+                    <span class="step-number">2</span>
+                    <div>
+                        <h3>Trade</h3>
+                        <p>Sell inventory at multiplier-heavy prices, then re-invest in stronger gear and upgrades.</p>
+                    </div>
+                </li>
+                <li class="story-step" data-reveal style="--reveal-delay: 150ms;">
+                    <span class="step-number">3</span>
+                    <div>
+                        <h3>Ascend</h3>
+                        <p>Prestige to reset tactically and lock in permanent bonuses for the next run.</p>
+                    </div>
+                </li>
+            </ol>
+        </section>
 
-    <script src="data.js?v=20260310c"></script>
-    <script src="game.js?v=20260310c"></script>
-    <script src="ui.js?v=20260310c"></script>
+        <section class="transcript" data-reveal>
+            <p class="hero-kicker">Field Notes</p>
+            <blockquote>
+                "I signed in to test one upgrade path. Three hours later I had a prestige route, a leaderboard plan,
+                and a rival in another time zone."
+            </blockquote>
+            <p class="quote-source">- Report from the Midnight Harvest Shift</p>
+        </section>
+
+        <section class="final-cta" data-reveal>
+            <h2>Open your farm account and enter the exchange.</h2>
+            <p>New farmers can sign up in under a minute. Returning farmers can jump straight back into their last save.</p>
+            <div class="hero-cta-row">
+                <a class="promo-btn promo-btn-solid" href="signup.html?next=game.html">Create Account</a>
+                <a class="promo-btn promo-btn-ghost" href="login.html?next=game.html">Log In</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="promo-footer">
+        <p>Virtual Farmer Cloud</p>
+        <p>Build your empire one harvest at a time.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase/config.js?v=20260314a"></script>
+    <script src="supabase/client.js?v=20260314a"></script>
+    <script src="promo.js?v=20260314a"></script>
 </body>
 
 </html>
-

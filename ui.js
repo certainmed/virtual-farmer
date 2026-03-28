@@ -15,6 +15,19 @@ function showNotification(message, rarity = "common") {
 }
 
 let modalReturnFocusEl = null;
+const SHOP_DEFAULT_SORT = 'recommended';
+const shopUIState = {
+    activeCategory: 'all',
+    sortBy: SHOP_DEFAULT_SORT,
+    hideOwned: false
+};
+const leaderboardState = {
+    mostPlants: [],
+    highestBalance: [],
+    highestXP: [],
+    loadedAt: 0,
+    loading: false
+};
 
 function openModal(modalEl, focusSelector) {
     if (!modalEl) return;
@@ -87,6 +100,7 @@ function updateAllUI() {
     updateInventoryPage();
     updateStatsPage();
     updateAchievementsPage();
+    updateLeaderboardPage();
     updateAutoFarmUI();
     updateAutoFarmStats();
 }
@@ -131,11 +145,14 @@ function updateFertilizerSelect() {
 }
 
 function updatePrestigeCard() {
-    const card = document.getElementById('prestige-card');
+    const title = document.getElementById('prestige-title');
     const desc = document.getElementById('prestige-description');
+    const button = document.getElementById('prestige-btn');
+    const statusPill = document.getElementById('prestige-status-pill');
+
+    if (!desc || !button || !title || !statusPill) return;
 
     if (canPrestige()) {
-        card.style.display = 'block';
         const newBonus = (game.prestigeLevel + 1) * 2;
         let text = `Reset your progress to gain Prestige Level ${game.prestigeLevel + 1} with a permanent +${newBonus}% bonus to all yields and earnings!`;
 
@@ -146,9 +163,19 @@ function updatePrestigeCard() {
             text += ` You will keep ${formatMoney(keptAmount)} (${keepPercent}% via Offshore Account).`;
         }
 
+        title.textContent = 'Prestige Ready';
         desc.textContent = text;
+        button.disabled = false;
+        statusPill.textContent = `Ready | Lv. ${game.prestigeLevel + 1}`;
+        statusPill.classList.add('active');
     } else {
-        card.style.display = 'none';
+        const prestigeBalanceTarget = 5000000;
+        const nextLevel = game.prestigeLevel + 1;
+        title.textContent = 'Prestige Locked';
+        desc.textContent = `Reach ${formatMoney(prestigeBalanceTarget)} balance or max every upgrade to unlock Prestige Level ${nextLevel}. Prestige grants a permanent +${nextLevel * 2}% bonus to future yields and earnings.`;
+        button.disabled = true;
+        statusPill.textContent = `Locked | Need ${formatMoney(prestigeBalanceTarget)}`;
+        statusPill.classList.remove('active');
     }
 }
 
@@ -157,98 +184,326 @@ function getHoeDisplayCost(hoe) {
     return Math.floor(hoe.cost * discount);
 }
 
-function updateShopPage() {
-    // Hoes
-    const hoeGrid = document.getElementById('hoe-grid');
-    hoeGrid.innerHTML = '';
+function formatFixedTrimmed(value, digits = 2) {
+    return value.toFixed(digits).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
+}
 
-    const sortedHoes = HOES.map((hoe, index) => ({
-        hoe,
-        index,
-        displayCost: getHoeDisplayCost(hoe)
-    })).sort((a, b) => {
-        if (a.displayCost !== b.displayCost) return a.displayCost - b.displayCost;
-        if (a.hoe.cost !== b.hoe.cost) return a.hoe.cost - b.hoe.cost;
+function formatRoiLabel(roi) {
+    if (!Number.isFinite(roi) || roi <= 0) return 'ROI: n/a';
+    if (roi >= 1) return `ROI: +${formatFixedTrimmed(roi)}x per $1`;
+    if (roi >= 1e-3) return `ROI: +${formatFixedTrimmed(roi * 1000)}x per $1K`;
+    if (roi >= 1e-6) return `ROI: +${formatFixedTrimmed(roi * 1e6)}x per $1M`;
+    if (roi >= 1e-9) return `ROI: +${formatFixedTrimmed(roi * 1e9)}x per $1B`;
+    return `ROI: +${formatFixedTrimmed(roi * 1e12)}x per $1T`;
+}
+
+function formatEfficiencyLabel(efficiency) {
+    if (!Number.isFinite(efficiency) || efficiency <= 0) return '0 / $1';
+    if (efficiency >= 1) return `${formatFixedTrimmed(efficiency)} / $1`;
+    return `${formatFixedTrimmed(efficiency * 1000)} / $1K`;
+}
+
+function updateShopPage() {
+    const hoeGrid = document.getElementById('hoe-grid');
+    const fertGrid = document.getElementById('fertilizer-grid');
+    if (!hoeGrid || !fertGrid) return;
+
+    const sortSelect = document.getElementById('shop-sort-select');
+    const hideOwnedToggle = document.getElementById('shop-hide-owned');
+    if (sortSelect && sortSelect.value !== shopUIState.sortBy) {
+        sortSelect.value = shopUIState.sortBy;
+    }
+    if (hideOwnedToggle) {
+        hideOwnedToggle.checked = shopUIState.hideOwned;
+    }
+
+    document.querySelectorAll('[data-shop-category]').forEach(btn => {
+        const isActive = btn.dataset.shopCategory === shopUIState.activeCategory;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-pressed', String(isActive));
+    });
+
+    const hoeSection = document.getElementById('shop-hoe-section');
+    const fertilizerSection = document.getElementById('shop-fertilizer-section');
+    const showHoes = shopUIState.activeCategory === 'all' || shopUIState.activeCategory === 'hoes';
+    const showFertilizers = shopUIState.activeCategory === 'all' || shopUIState.activeCategory === 'fertilizers';
+    if (hoeSection) {
+        hoeSection.hidden = !showHoes;
+        if (shopUIState.activeCategory === 'hoes') hoeSection.open = true;
+    }
+    if (fertilizerSection) {
+        fertilizerSection.hidden = !showFertilizers;
+        if (shopUIState.activeCategory === 'fertilizers') fertilizerSection.open = true;
+    }
+
+    const selectedHoe = HOES[game.selectedHoeIndex] || HOES[0];
+    const hoeEntries = HOES.map((hoe, index) => {
+        const displayCost = getHoeDisplayCost(hoe);
+        const owned = game.unlockedHoes.includes(index);
+        const deltaMultiplier = Math.max(hoe.multiplier - selectedHoe.multiplier, 0);
+        const roi = !owned && displayCost > 0 ? deltaMultiplier / displayCost : 0;
+        return {
+            hoe,
+            index,
+            owned,
+            equipped: game.selectedHoeIndex === index,
+            canBuy: !owned && game.balance >= displayCost,
+            displayCost,
+            deltaMultiplier,
+            roi,
+            isCheapestNext: false,
+            isBestRoi: false
+        };
+    });
+
+    const unownedHoes = hoeEntries.filter(entry => !entry.owned);
+    const cheapestNextHoe = unownedHoes.reduce((best, current) => {
+        if (!best) return current;
+        if (current.displayCost < best.displayCost) return current;
+        if (current.displayCost === best.displayCost && current.index < best.index) return current;
+        return best;
+    }, null);
+    const bestRoiHoe = unownedHoes.reduce((best, current) => {
+        if (!best) return current;
+        if (current.roi > best.roi) return current;
+        if (current.roi === best.roi && current.displayCost < best.displayCost) return current;
+        return best;
+    }, null);
+
+    if (cheapestNextHoe) {
+        const item = hoeEntries[cheapestNextHoe.index];
+        if (item) item.isCheapestNext = true;
+    }
+    if (bestRoiHoe) {
+        const item = hoeEntries[bestRoiHoe.index];
+        if (item) item.isBestRoi = true;
+    }
+
+    let visibleHoes = hoeEntries.filter(entry => !(shopUIState.hideOwned && entry.owned));
+    visibleHoes.sort((a, b) => {
+        switch (shopUIState.sortBy) {
+            case 'price-desc':
+                if (a.displayCost !== b.displayCost) return b.displayCost - a.displayCost;
+                break;
+            case 'power-desc':
+                if (a.hoe.multiplier !== b.hoe.multiplier) return b.hoe.multiplier - a.hoe.multiplier;
+                break;
+            case 'efficiency-desc':
+                if (a.roi !== b.roi) return b.roi - a.roi;
+                break;
+            case 'name':
+                return a.hoe.name.localeCompare(b.hoe.name);
+            case 'recommended': {
+                const rankFor = (entry) => {
+                    if (entry.isBestRoi && !entry.owned) return 0;
+                    if (entry.isCheapestNext && !entry.owned) return 1;
+                    if (!entry.owned && entry.canBuy) return 2;
+                    if (!entry.owned) return 3;
+                    if (entry.equipped) return 4;
+                    return 5;
+                };
+                const rankDiff = rankFor(a) - rankFor(b);
+                if (rankDiff !== 0) return rankDiff;
+                if (a.displayCost !== b.displayCost) return a.displayCost - b.displayCost;
+                break;
+            }
+            case 'price-asc':
+            default:
+                if (a.displayCost !== b.displayCost) return a.displayCost - b.displayCost;
+                break;
+        }
         return a.index - b.index;
     });
 
-    for (const { hoe, index: i, displayCost } of sortedHoes) {
-        const owned = game.unlockedHoes.includes(i);
-        const equipped = game.selectedHoeIndex === i;
-        const canBuy = !owned && game.balance >= displayCost;
-
-        const card = document.createElement('div');
-        card.className = `item-card${owned ? ' owned' : ''}${equipped ? ' equipped' : ''}`;
-
-        let priceHtml;
-        if (hoe.cost === 0) {
-            priceHtml = 'Free';
-        } else if (displayCost < hoe.cost) {
-            priceHtml = `<s style="opacity:0.5;font-size:0.75rem">${formatMoney(hoe.cost)}</s> ${formatMoney(displayCost)}`;
-        } else {
-            priceHtml = formatMoney(hoe.cost);
-        }
-
-        card.innerHTML = `
-            <div class="item-header">
-                <span class="item-name">${hoe.name}</span>
-                <span class="item-price">${priceHtml}</span>
-            </div>
-            <div class="item-stats">Multiplier: ${hoe.multiplier}x</div>
-            ${owned
-                ? (equipped
-                    ? '<button class="btn" disabled>Equipped</button>'
-                    : `<button class="btn btn-secondary" onclick="equipHoe(${i})">Equip</button>`)
-                : `<button class="btn" ${canBuy ? '' : 'disabled'} onclick="buyHoe(${i})">Buy</button>`
-            }
-        `;
-        hoeGrid.appendChild(card);
-    }
-
-    // Fertilizers
-    const fertGrid = document.getElementById('fertilizer-grid');
-    fertGrid.innerHTML = '';
-
-    const sortedFertilizers = [...FERTILIZERS].sort((a, b) => {
-        if (a.cost !== b.cost) return a.cost - b.cost;
-        if (a.bonus !== b.bonus) return a.bonus - b.bonus;
-        return a.name.localeCompare(b.name);
+    const fertilizerEntries = FERTILIZERS.map((fert, index) => {
+        const qty = game.fertilizers[fert.name] || 0;
+        return {
+            fert,
+            index,
+            qty,
+            canBuy: game.balance >= fert.cost,
+            efficiency: fert.bonus / Math.max(fert.cost, 1),
+            isMostEfficient: false
+        };
     });
 
-    for (const fert of sortedFertilizers) {
-        const qty = game.fertilizers[fert.name] || 0;
-        const canBuy = game.balance >= fert.cost;
+    const mostEfficientFertilizer = fertilizerEntries.reduce((best, current) => {
+        if (!best) return current;
+        if (current.efficiency > best.efficiency) return current;
+        if (current.efficiency === best.efficiency && current.fert.cost < best.fert.cost) return current;
+        return best;
+    }, null);
+    if (mostEfficientFertilizer) {
+        const item = fertilizerEntries[mostEfficientFertilizer.index];
+        if (item) item.isMostEfficient = true;
+    }
 
-        const card = document.createElement('div');
-        card.className = 'item-card';
-        card.innerHTML = `
-            <div class="item-header">
-                <span class="item-name">${fert.name}</span>
-                <span class="item-price">${formatMoney(fert.cost)}</span>
-            </div>
-            <div class="item-stats">Bonus: +${formatNumber(fert.bonus)} yield | Owned: ${qty}</div>
+    let visibleFertilizers = fertilizerEntries.filter(entry => !(shopUIState.hideOwned && entry.qty > 0));
+    visibleFertilizers.sort((a, b) => {
+        switch (shopUIState.sortBy) {
+            case 'price-desc':
+                if (a.fert.cost !== b.fert.cost) return b.fert.cost - a.fert.cost;
+                break;
+            case 'power-desc':
+                if (a.fert.bonus !== b.fert.bonus) return b.fert.bonus - a.fert.bonus;
+                break;
+            case 'efficiency-desc':
+                if (a.efficiency !== b.efficiency) return b.efficiency - a.efficiency;
+                break;
+            case 'name':
+                return a.fert.name.localeCompare(b.fert.name);
+            case 'recommended': {
+                const rankFor = (entry) => {
+                    if (entry.isMostEfficient) return 0;
+                    if (entry.canBuy && entry.qty === 0) return 1;
+                    if (entry.canBuy) return 2;
+                    return 3;
+                };
+                const rankDiff = rankFor(a) - rankFor(b);
+                if (rankDiff !== 0) return rankDiff;
+                if (a.fert.cost !== b.fert.cost) return a.fert.cost - b.fert.cost;
+                break;
+            }
+            case 'price-asc':
+            default:
+                if (a.fert.cost !== b.fert.cost) return a.fert.cost - b.fert.cost;
+                break;
+        }
+        return a.index - b.index;
+    });
+
+    const hoeMeta = document.getElementById('shop-hoe-meta');
+    const fertilizerMeta = document.getElementById('shop-fertilizer-meta');
+    const ownedHoeCount = game.unlockedHoes.length;
+    const stockedFertilizerCount = FERTILIZERS.reduce((count, fert) => count + ((game.fertilizers[fert.name] || 0) > 0 ? 1 : 0), 0);
+    if (hoeMeta) {
+        hoeMeta.textContent = `${ownedHoeCount}/${HOES.length} owned${shopUIState.hideOwned ? ` | ${visibleHoes.length} shown` : ''}`;
+    }
+    if (fertilizerMeta) {
+        fertilizerMeta.textContent = `${stockedFertilizerCount}/${FERTILIZERS.length} stocked${shopUIState.hideOwned ? ` | ${visibleFertilizers.length} shown` : ''}`;
+    }
+
+    const insights = document.getElementById('shop-insights');
+    if (insights) {
+        const bestRoiText = bestRoiHoe
+            ? `<strong>${bestRoiHoe.hoe.name}</strong><span>${formatRoiLabel(bestRoiHoe.roi)}</span>`
+            : '<strong>All hoes owned</strong><span>No ROI targets left.</span>';
+        const cheapestNextText = cheapestNextHoe
+            ? `<strong>${cheapestNextHoe.hoe.name}</strong><span>${formatMoney(cheapestNextHoe.displayCost)}</span>`
+            : '<strong>No next upgrade</strong><span>You own every hoe.</span>';
+        const bestFertText = mostEfficientFertilizer
+            ? `<strong>${mostEfficientFertilizer.fert.name}</strong><span>Efficiency: +${formatEfficiencyLabel(mostEfficientFertilizer.efficiency)} yield</span>`
+            : '<strong>No fertilizer data</strong><span>Unavailable</span>';
+
+        insights.innerHTML = `
+            <article class="shop-insight-card">
+                <p>Best ROI Hoe</p>
+                ${bestRoiText}
+            </article>
+            <article class="shop-insight-card">
+                <p>Cheapest Next Upgrade</p>
+                ${cheapestNextText}
+            </article>
+            <article class="shop-insight-card">
+                <p>Most Efficient Fertilizer</p>
+                ${bestFertText}
+            </article>
         `;
+    }
 
-        const actions = document.createElement('div');
-        actions.style.display = 'flex';
-        actions.style.gap = '5px';
+    hoeGrid.innerHTML = '';
+    if (visibleHoes.length === 0) {
+        hoeGrid.innerHTML = '<p class="shop-empty">No hoes match the current filter.</p>';
+    } else {
+        for (const entry of visibleHoes) {
+            const { hoe, index, owned, equipped, canBuy, displayCost, deltaMultiplier } = entry;
+            const card = document.createElement('div');
+            card.className = `item-card${owned ? ' owned' : ''}${equipped ? ' equipped' : ''}`;
 
-        const purchaseAmounts = [1, 10, 100];
-        for (const amount of purchaseAmounts) {
-            const btn = document.createElement('button');
-            btn.className = amount === 100 ? 'btn btn-secondary' : 'btn';
-            btn.textContent = `+${amount}`;
-            btn.disabled = game.balance < (fert.cost * amount);
-            btn.addEventListener('click', () => buyFertilizer(fert.name, amount));
-            actions.appendChild(btn);
+            let priceHtml;
+            if (hoe.cost === 0) {
+                priceHtml = 'Free';
+            } else if (displayCost < hoe.cost) {
+                priceHtml = `<s style="opacity:0.5;font-size:0.75rem">${formatMoney(hoe.cost)}</s> ${formatMoney(displayCost)}`;
+            } else {
+                priceHtml = formatMoney(hoe.cost);
+            }
+
+            const badges = [];
+            if (entry.isBestRoi && !owned) badges.push('<span class="item-badge item-badge-roi">Best ROI</span>');
+            if (entry.isCheapestNext && !owned) badges.push('<span class="item-badge item-badge-cheap">Cheapest Next</span>');
+            if (equipped) badges.push('<span class="item-badge item-badge-equipped">Equipped</span>');
+            if (owned && !equipped) badges.push('<span class="item-badge item-badge-owned">Owned</span>');
+
+            card.innerHTML = `
+                <div class="item-header">
+                    <span class="item-name">${hoe.name}</span>
+                    <span class="item-price">${priceHtml}</span>
+                </div>
+                ${badges.length ? `<div class="item-badges">${badges.join('')}</div>` : ''}
+                <div class="item-stats">Multiplier: ${formatNumber(hoe.multiplier)}x</div>
+                <div class="item-stats">${owned ? 'Ready to equip.' : `Gain vs equipped: +${formatNumber(deltaMultiplier)}x`}</div>
+                ${owned
+                    ? (equipped
+                        ? '<button class="btn" disabled>Equipped</button>'
+                        : '<button class="btn btn-secondary">Equip</button>')
+                    : `<button class="btn" ${canBuy ? '' : 'disabled'}>Buy</button>`
+                }
+            `;
+
+            const actionBtn = card.querySelector('button');
+            if (actionBtn) {
+                actionBtn.addEventListener('click', () => {
+                    if (owned) {
+                        if (!equipped) equipHoe(index);
+                    } else {
+                        buyHoe(index);
+                    }
+                });
+            }
+            hoeGrid.appendChild(card);
         }
+    }
 
-        if (!canBuy) {
-            actions.querySelector('button')?.setAttribute('disabled', 'true');
+    fertGrid.innerHTML = '';
+    if (visibleFertilizers.length === 0) {
+        fertGrid.innerHTML = '<p class="shop-empty">No fertilizers match the current filter.</p>';
+    } else {
+        for (const entry of visibleFertilizers) {
+            const { fert, qty, canBuy, efficiency } = entry;
+
+            const card = document.createElement('div');
+            card.className = `item-card${qty > 0 ? ' owned' : ''}`;
+
+            const badges = [];
+            if (entry.isMostEfficient) badges.push('<span class="item-badge item-badge-eff">Most Efficient</span>');
+            if (qty > 0) badges.push('<span class="item-badge item-badge-owned">Stocked</span>');
+
+            card.innerHTML = `
+                <div class="item-header">
+                    <span class="item-name">${fert.name}</span>
+                    <span class="item-price">${formatMoney(fert.cost)}</span>
+                </div>
+                ${badges.length ? `<div class="item-badges">${badges.join('')}</div>` : ''}
+                <div class="item-stats">Bonus: +${formatNumber(fert.bonus)} yield | Owned: ${formatNumber(qty)}</div>
+                <div class="item-stats">Efficiency: +${formatEfficiencyLabel(efficiency)} yield</div>
+            `;
+
+            const actions = document.createElement('div');
+            actions.className = 'fert-actions';
+            const purchaseAmounts = [1, 10, 100];
+            for (const amount of purchaseAmounts) {
+                const btn = document.createElement('button');
+                btn.className = amount === 100 ? 'btn btn-secondary' : 'btn';
+                btn.textContent = `+${amount}`;
+                btn.disabled = !canBuy || game.balance < (fert.cost * amount);
+                btn.addEventListener('click', () => buyFertilizer(fert.name, amount));
+                actions.appendChild(btn);
+            }
+
+            card.appendChild(actions);
+            fertGrid.appendChild(card);
         }
-
-        card.appendChild(actions);
-        fertGrid.appendChild(card);
     }
 }
 
@@ -395,6 +650,97 @@ function updateAchievementsPage() {
     }).join('');
 }
 
+function formatLeaderboardValue(metric, value) {
+    const numericValue = Number(value) || 0;
+    if (metric === "balance") return formatMoney(numericValue);
+    return formatNumber(numericValue);
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function renderLeaderboardTable(bodyId, rows, metric) {
+    const body = document.getElementById(bodyId);
+    if (!body) return;
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+        body.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">No leaderboard data yet</td></tr>';
+        return;
+    }
+
+    const currentUserId = window.VirtualFarmerSupabase?.getCurrentUser()?.id || null;
+    body.innerHTML = rows.map((row, index) => {
+        const displayName = row?.display_name || `Farmer-${String(row?.user_id || "").slice(0, 8)}`;
+        const safeDisplayName = escapeHtml(displayName);
+        const value =
+            metric === "total_plants" ? row.total_plants :
+            metric === "balance" ? row.balance :
+            row.xp;
+        const safeValue = escapeHtml(formatLeaderboardValue(metric, value));
+        const isCurrentUser = currentUserId && row?.user_id === currentUserId;
+
+        return `
+            <tr class="${isCurrentUser ? "leaderboard-self" : ""}">
+                <td class="leaderboard-rank">${index + 1}</td>
+                <td>${safeDisplayName}</td>
+                <td>${safeValue}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function updateLeaderboardPage() {
+    renderLeaderboardTable("leaderboard-plants-body", leaderboardState.mostPlants, "total_plants");
+    renderLeaderboardTable("leaderboard-balance-body", leaderboardState.highestBalance, "balance");
+    renderLeaderboardTable("leaderboard-xp-body", leaderboardState.highestXP, "xp");
+
+    const stampEl = document.getElementById("leaderboard-last-updated");
+    if (!stampEl) return;
+    if (!leaderboardState.loadedAt) {
+        stampEl.textContent = "Last updated: not loaded yet";
+        return;
+    }
+    const loadedDate = new Date(leaderboardState.loadedAt);
+    stampEl.textContent = `Last updated: ${loadedDate.toLocaleString()}`;
+}
+
+async function refreshLeaderboard({ force = false } = {}) {
+    const supabaseApi = window.VirtualFarmerSupabase;
+    if (!supabaseApi || !supabaseApi.isAuthenticated()) {
+        return;
+    }
+
+    if (leaderboardState.loading) return;
+    if (!force && leaderboardState.loadedAt && (Date.now() - leaderboardState.loadedAt < 15000)) {
+        return;
+    }
+
+    const refreshButton = document.getElementById("refresh-leaderboard-btn");
+    if (refreshButton) refreshButton.disabled = true;
+    leaderboardState.loading = true;
+
+    try {
+        const bundle = await supabaseApi.fetchLeaderboardBundle(10);
+        leaderboardState.mostPlants = Array.isArray(bundle.mostPlants) ? bundle.mostPlants : [];
+        leaderboardState.highestBalance = Array.isArray(bundle.highestBalance) ? bundle.highestBalance : [];
+        leaderboardState.highestXP = Array.isArray(bundle.highestXP) ? bundle.highestXP : [];
+        leaderboardState.loadedAt = Date.now();
+        updateLeaderboardPage();
+    } catch (error) {
+        console.error("Failed to refresh leaderboard:", error);
+        showNotification("Failed to load leaderboard.", "common");
+    } finally {
+        leaderboardState.loading = false;
+        if (refreshButton) refreshButton.disabled = false;
+    }
+}
+
 // ==================== AUTO FARM UI ====================
 function updateAutoFarmUI() {
     const toggleBtn = document.getElementById('auto-farm-toggle');
@@ -456,18 +802,126 @@ function updateAutoFarmStats() {
     }
 }
 
+function setupShopControls() {
+    const sortSelect = document.getElementById('shop-sort-select');
+    if (sortSelect) {
+        sortSelect.value = shopUIState.sortBy;
+        sortSelect.addEventListener('change', (event) => {
+            shopUIState.sortBy = event.target.value || SHOP_DEFAULT_SORT;
+            updateShopPage();
+        });
+    }
+
+    const hideOwnedToggle = document.getElementById('shop-hide-owned');
+    if (hideOwnedToggle) {
+        hideOwnedToggle.checked = shopUIState.hideOwned;
+        hideOwnedToggle.addEventListener('change', (event) => {
+            shopUIState.hideOwned = event.target.checked;
+            updateShopPage();
+        });
+    }
+
+    document.querySelectorAll('[data-shop-category]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            shopUIState.activeCategory = btn.dataset.shopCategory || 'all';
+            updateShopPage();
+        });
+    });
+}
+
+function updateSignedInUserPanel() {
+    const playerNameEl = document.getElementById('player-display-name');
+    const loginBtn = document.getElementById('login-btn');
+    const signupBtn = document.getElementById('signup-btn');
+    const signOutBtn = document.getElementById('signout-btn');
+    const mobileLoginBtn = document.getElementById('mobile-login-btn');
+    const mobileSignupBtn = document.getElementById('mobile-signup-btn');
+    const mobileSignOutBtn = document.getElementById('mobile-signout-btn');
+    if (!playerNameEl || !loginBtn || !signupBtn || !signOutBtn) return;
+
+    const next = encodeURIComponent('game.html');
+    loginBtn.href = `login.html?next=${next}`;
+    signupBtn.href = `signup.html?next=${next}`;
+    if (mobileLoginBtn) mobileLoginBtn.href = `login.html?next=${next}`;
+    if (mobileSignupBtn) mobileSignupBtn.href = `signup.html?next=${next}`;
+
+    const supabaseApi = window.VirtualFarmerSupabase;
+    if (!supabaseApi || !supabaseApi.isConfigured()) {
+        playerNameEl.textContent = 'Local Mode';
+        loginBtn.hidden = false;
+        signupBtn.hidden = false;
+        signOutBtn.hidden = true;
+        if (mobileLoginBtn) mobileLoginBtn.hidden = false;
+        if (mobileSignupBtn) mobileSignupBtn.hidden = false;
+        if (mobileSignOutBtn) mobileSignOutBtn.hidden = true;
+        return;
+    }
+
+    if (!supabaseApi.isAuthenticated()) {
+        playerNameEl.textContent = 'Not Signed In';
+        loginBtn.hidden = false;
+        signupBtn.hidden = false;
+        signOutBtn.hidden = true;
+        if (mobileLoginBtn) mobileLoginBtn.hidden = false;
+        if (mobileSignupBtn) mobileSignupBtn.hidden = false;
+        if (mobileSignOutBtn) mobileSignOutBtn.hidden = true;
+        return;
+    }
+
+    const currentUser = supabaseApi.getCurrentUser();
+    playerNameEl.textContent = currentUser?.email || supabaseApi.getDisplayName();
+    loginBtn.hidden = true;
+    signupBtn.hidden = true;
+    signOutBtn.hidden = false;
+    if (mobileLoginBtn) mobileLoginBtn.hidden = true;
+    if (mobileSignupBtn) mobileSignupBtn.hidden = true;
+    if (mobileSignOutBtn) mobileSignOutBtn.hidden = false;
+}
+
+function setActivePage(pageName) {
+    const targetPage = document.getElementById(`page-${pageName}`);
+    if (!targetPage) return;
+    const primaryMobilePages = new Set(['main', 'shop', 'inventory']);
+
+    document.body.dataset.activePage = pageName;
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.toggle('active', page.id === `page-${pageName}`);
+    });
+    document.querySelectorAll('[data-page]').forEach(control => {
+        if (control.id === 'mobile-nav-more' || control.id === 'mobile-more-btn') return;
+        const isActive = control.dataset.page === pageName;
+        control.classList.toggle('active', isActive);
+        if (control.matches('button')) {
+            control.setAttribute('aria-pressed', String(isActive));
+        }
+    });
+    const moreIsActive = !primaryMobilePages.has(pageName);
+    document.getElementById('mobile-nav-more')?.classList.toggle('active', moreIsActive);
+    document.getElementById('mobile-more-btn')?.classList.toggle('active', moreIsActive);
+}
+
+async function handlePageChange(pageName) {
+    setActivePage(pageName);
+    if (pageName === 'leaderboard') {
+        await refreshLeaderboard({ force: false });
+    }
+}
+
+function bindPageNavigation(control) {
+    if (!control) return;
+    control.addEventListener('click', async () => {
+        await handlePageChange(control.dataset.page);
+        const mobileNavModal = document.getElementById('mobile-nav-modal');
+        if (mobileNavModal?.classList.contains('active')) {
+            closeModal(mobileNavModal);
+        }
+    });
+}
+
 // ==================== EVENT LISTENERS ====================
 function setupEventListeners() {
     // Navigation
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-
-            btn.classList.add('active');
-            document.getElementById(`page-${btn.dataset.page}`).classList.add('active');
-        });
-    });
+    document.querySelectorAll('.nav-btn[data-page], .mobile-nav-btn[data-page]').forEach(bindPageNavigation);
 
     // Farm button
     document.getElementById('farm-btn').addEventListener('click', farm);
@@ -489,54 +943,36 @@ function setupEventListeners() {
     // Inventory sort/filter
     document.getElementById('sort-select').addEventListener('change', updateInventoryPage);
     document.getElementById('filter-select').addEventListener('change', updateInventoryPage);
+    setupShopControls();
 
-    // Export/Import
-    document.getElementById('export-btn').addEventListener('click', () => {
-        const modal = document.getElementById('save-modal');
-        const textarea = document.getElementById('save-textarea');
-        const actionBtn = document.getElementById('modal-action');
+    const refreshLeaderboardBtn = document.getElementById('refresh-leaderboard-btn');
+    if (refreshLeaderboardBtn) {
+        refreshLeaderboardBtn.addEventListener('click', async () => {
+            await refreshLeaderboard({ force: true });
+        });
+    }
 
-        document.getElementById('modal-title').textContent = 'Export Save';
-        textarea.value = exportSave();
-        textarea.readOnly = true;
-        actionBtn.textContent = 'Copy';
-        actionBtn.onclick = () => {
-            navigator.clipboard.writeText(textarea.value).then(() => {
-                showNotification('Copied to clipboard!', 'achievement');
-            }).catch(() => {
-                textarea.select();
-                document.execCommand('copy');
-                showNotification('Copied to clipboard!', 'achievement');
-            });
-        };
-        openModal(modal, '#save-textarea');
-        textarea.select();
-    });
+    const signOutBtn = document.getElementById('signout-btn');
+    const mobileSignOutBtn = document.getElementById('mobile-signout-btn');
+    const handleSignOut = async (button) => {
+        const supabaseApi = window.VirtualFarmerSupabase;
+        if (!supabaseApi || !supabaseApi.isAuthenticated()) return;
 
-    document.getElementById('import-btn').addEventListener('click', () => {
-        const modal = document.getElementById('save-modal');
-        const textarea = document.getElementById('save-textarea');
-        const actionBtn = document.getElementById('modal-action');
+        button.disabled = true;
+        await supabaseApi.signOut({ redirectTo: 'login.html?next=game.html' });
+        button.disabled = false;
+    };
 
-        document.getElementById('modal-title').textContent = 'Import Save';
-        textarea.value = '';
-        textarea.readOnly = false;
-        textarea.placeholder = 'Paste your save code here...';
-        actionBtn.textContent = 'Import';
-        actionBtn.onclick = () => {
-            if (importSave(textarea.value.trim())) {
-                closeModal(modal);
-            }
-        };
-        openModal(modal, '#save-textarea');
-    });
-
-    document.getElementById('modal-close').addEventListener('click', () => {
-        closeModal(document.getElementById('save-modal'));
-    });
+    if (signOutBtn) {
+        signOutBtn.addEventListener('click', async () => handleSignOut(signOutBtn));
+    }
+    if (mobileSignOutBtn) {
+        mobileSignOutBtn.addEventListener('click', async () => handleSignOut(mobileSignOutBtn));
+    }
 
     // Prestige
     document.getElementById('prestige-btn').addEventListener('click', () => {
+        if (!canPrestige()) return;
         const newBonus = (game.prestigeLevel + 1) * 2;
         let previewText = `You will gain: Prestige Level ${game.prestigeLevel + 1} with +${newBonus}% permanent bonus!`;
 
@@ -555,6 +991,20 @@ function setupEventListeners() {
     });
 
     document.getElementById('prestige-confirm').addEventListener('click', prestige);
+
+    const mobileNavModal = document.getElementById('mobile-nav-modal');
+    const mobileNavTriggers = [
+        document.getElementById('mobile-nav-more'),
+        document.getElementById('mobile-more-btn')
+    ];
+    mobileNavTriggers.filter(Boolean).forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            openModal(mobileNavModal, '#mobile-nav-close');
+        });
+    });
+    document.getElementById('mobile-nav-close').addEventListener('click', () => {
+        closeModal(mobileNavModal);
+    });
 
     // Close modals when clicking backdrop
     document.querySelectorAll('.modal').forEach(modal => {
@@ -617,17 +1067,54 @@ function setupEventListeners() {
 }
 
 // ==================== INITIALIZATION ====================
-function init() {
-    loadGame();
-    setupEventListeners();
-    updateAllUI();
-    updateAutoFarmStats();
+async function init() {
+    const supabaseApi = window.VirtualFarmerSupabase;
+    const redirectTarget = `login.html?next=${encodeURIComponent('game.html')}`;
+    let shouldRevealApp = true;
 
-    // Process offline auto-farm earnings
-    processOfflineAutoFarm();
+    try {
+        if (supabaseApi) {
+            const initResult = await supabaseApi.init({ requireAuth: true, redirectTo: redirectTarget });
+            if (initResult.configured && !initResult.user && !initResult.error) {
+                shouldRevealApp = false;
+                return;
+            }
+            if (initResult.error) {
+                console.error("Supabase init error:", initResult.error);
+            }
 
-    // Auto-save every 30 seconds
-    setInterval(saveGame, 30000);
+            if (supabaseApi.isConfigured()) {
+                supabaseApi.onAuthStateChange(() => {
+                    updateSignedInUserPanel();
+                });
+            }
+        }
+
+        loadGame();
+        await syncProgressWithCloud();
+
+        // Process offline auto-farm earnings
+        processOfflineAutoFarm();
+
+        setupEventListeners();
+        setActivePage('main');
+        updateSignedInUserPanel();
+        updateAllUI();
+        updateAutoFarmStats();
+
+        if (supabaseApi && supabaseApi.isAuthenticated()) {
+            await refreshLeaderboard({ force: true });
+        }
+
+        // Auto-save every 30 seconds
+        setInterval(saveGame, 30000);
+    } catch (error) {
+        console.error("Initialization failed:", error);
+    } finally {
+        if (shouldRevealApp) {
+            document.body.dataset.appReady = 'true';
+        }
+    }
 }
 
-init();
+void init();

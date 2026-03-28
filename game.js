@@ -6,6 +6,7 @@ let cooldownEndTime = 0;
 let autoFarmInterval = null;
 let autoFarmActive = false;
 let autoFarmSessionHarvests = 0;
+let localSaveTimestamp = 0;
 
 function getDefaultGame() {
     return {
@@ -171,10 +172,95 @@ function formatMoney(num) {
 }
 
 // ==================== SAVE/LOAD ====================
-function saveGame() {
+function buildSaveDataPayload() {
+    return {
+        game,
+        stats: getSerializableStats(),
+        autoFarmState: loadAutoFarmState() || { enabled: autoFarmActive, lastTick: Date.now() },
+        version: 2,
+        timestamp: Date.now()
+    };
+}
+
+function getProgressSnapshotForCloud() {
+    const payload = buildSaveDataPayload();
+    return {
+        ...payload,
+        totalPlants: getTotalPlants()
+    };
+}
+
+function queueCloudProgressSave(immediate = false) {
+    const supabaseApi = window.VirtualFarmerSupabase;
+    if (!supabaseApi || !supabaseApi.isAuthenticated()) return;
+    supabaseApi.queueSave(getProgressSnapshotForCloud(), { immediate });
+}
+
+function applyCloudProgressRow(progressRow) {
+    if (!progressRow || typeof progressRow !== "object") return false;
+
+    game = sanitizeLoadedGame(progressRow.game_state);
+    stats = sanitizeLoadedStats(progressRow.stats_state);
+
+    if (progressRow.auto_farm_state && typeof progressRow.auto_farm_state === "object") {
+        const enabled = Boolean(progressRow.auto_farm_state.enabled);
+        const lastTick = Number(progressRow.auto_farm_state.lastTick);
+        localStorage.setItem('autoFarmState', JSON.stringify({
+            enabled,
+            lastTick: Number.isFinite(lastTick) && lastTick > 0 ? Math.floor(lastTick) : Date.now()
+        }));
+    }
+
+    const cloudTimestamp = Date.parse(progressRow.last_saved_at || progressRow.updated_at || "");
+    localSaveTimestamp = Number.isFinite(cloudTimestamp) ? cloudTimestamp : Date.now();
+    initGame();
+    return true;
+}
+
+async function syncProgressWithCloud() {
+    const supabaseApi = window.VirtualFarmerSupabase;
+    if (!supabaseApi || !supabaseApi.isAuthenticated()) return;
+
     try {
-        const saveData = { game, stats: getSerializableStats(), version: 1, timestamp: Date.now() };
+        const cloudRow = await supabaseApi.loadProgress();
+        if (!cloudRow) {
+            await supabaseApi.saveProgress(getProgressSnapshotForCloud());
+            return;
+        }
+
+        const cloudTimestamp = Date.parse(cloudRow.last_saved_at || cloudRow.updated_at || "");
+        const normalizedCloudTimestamp = Number.isFinite(cloudTimestamp) ? cloudTimestamp : 0;
+
+        if (normalizedCloudTimestamp > localSaveTimestamp) {
+            if (applyCloudProgressRow(cloudRow)) {
+                saveGame({ skipCloud: true });
+                showNotification("Cloud save loaded.", "achievement");
+            }
+            return;
+        }
+
+        if (localSaveTimestamp >= normalizedCloudTimestamp) {
+            await supabaseApi.saveProgress(getProgressSnapshotForCloud());
+        }
+    } catch (error) {
+        console.error("Cloud sync failed:", error);
+        showNotification("Cloud sync failed. Using local save.", "common");
+    }
+}
+
+function saveGame(options = {}) {
+    const saveOptions = (options && typeof options === "object") ? options : {};
+    const skipCloud = Boolean(saveOptions.skipCloud);
+    const immediateCloud = Boolean(saveOptions.immediateCloud);
+
+    try {
+        const saveData = buildSaveDataPayload();
         localStorage.setItem('virtualFarmerSave', JSON.stringify(saveData));
+        localSaveTimestamp = saveData.timestamp;
+
+        if (!skipCloud) {
+            queueCloudProgressSave(immediateCloud);
+        }
     } catch (e) {
         console.error("Save failed:", e);
     }
@@ -188,43 +274,22 @@ function loadGame() {
             if (parsed.game && typeof parsed.game === "object") {
                 game = sanitizeLoadedGame(parsed.game);
                 stats = sanitizeLoadedStats(parsed.stats);
+                localSaveTimestamp = sanitizeNonNegativeInt(parsed.timestamp, 0);
             } else {
                 throw new Error("Invalid save structure");
             }
         } else {
             game = getDefaultGame();
             stats = getDefaultStats();
+            localSaveTimestamp = 0;
         }
     } catch (e) {
         console.error("Load failed:", e);
         game = getDefaultGame();
         stats = getDefaultStats();
+        localSaveTimestamp = 0;
     }
     initGame();
-}
-
-function exportSave() {
-    const saveData = { game, stats: getSerializableStats(), version: 1, timestamp: Date.now() };
-    return btoa(JSON.stringify(saveData));
-}
-
-function importSave(code) {
-    try {
-        const decoded = JSON.parse(atob(code));
-        if (decoded.game && typeof decoded.game === "object") {
-            game = sanitizeLoadedGame(decoded.game);
-            stats = sanitizeLoadedStats(decoded.stats);
-            initGame();
-            saveGame();
-            updateAllUI();
-            showNotification("Save imported successfully!", "achievement");
-            return true;
-        }
-    } catch (e) {
-        console.error("Import failed:", e);
-    }
-    showNotification("Invalid save code!", "common");
-    return false;
 }
 
 // ==================== CALCULATIONS ====================
@@ -678,6 +743,7 @@ function startAutoFarm() {
     autoFarmTickCounter = 0;
     autoFarmInterval = setInterval(autoFarmTick, AUTO_FARM_INTERVAL);
     saveAutoFarmState();
+    queueCloudProgressSave(true);
     updateAutoFarmUI();
 }
 

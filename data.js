@@ -1,136 +1,252 @@
 // ==================== DATA DEFINITIONS ====================
-const BASE_HOES = [
-    { name: "Wooden Hoe", multiplier: 1.0, cost: 0 },
-    { name: "Stone Hoe", multiplier: 2.4, cost: 500 },
-    { name: "Lapis Hoe", multiplier: 3.7, cost: 1000 },
-    { name: "Gold Hoe", multiplier: 4.9, cost: 1500 },
-    { name: "Iron Hoe", multiplier: 4, cost: 2000 },
-    { name: "Diamond Hoe", multiplier: 2.3, cost: 2500 },
-    { name: "Netherite Hoe", multiplier: 2.58, cost: 3000 },
-    { name: "Special Hoe", multiplier: 1.95, cost: 5000 },
-    { name: "Emerald Hoe", multiplier: 3.2, cost: 7000 },
-    { name: "Obsidian Hoe", multiplier: 3.9, cost: 10000 },
-    { name: "Mythic Hoe", multiplier: 3.6, cost: 15000 },
-    { name: "Platinum Hoe", multiplier: 5.2, cost: 20000 },
-    { name: "Titanium Hoe", multiplier: 6.99, cost: 450000 },
-    { name: "God Hoe", multiplier: 10.9, cost: 950000 },
-    { name: "Dark Matter Hoe", multiplier: 15.0, cost: 2500000 },
-    { name: "Quantum Hoe", multiplier: 25.0, cost: 10000000 },
-    { name: "Singularity Hoe", multiplier: 50.0, cost: 50000000 },
-    { name: "Plasma Cutter", multiplier: 85.5, cost: 150000000 },
-    { name: "Solar Flare Hoe", multiplier: 140.0, cost: 450000000 },
-    { name: "Nebula Harvester", multiplier: 255.2, cost: 1200000000 },
-    { name: "String Theory Hoe", multiplier: 420.0, cost: 5500000000 },
-    { name: "Antimatter Scythe", multiplier: 666.6, cost: 25000000000 },
-    { name: "Time-Weaver's Tool", multiplier: 1024.0, cost: 100000000000 },
-    { name: "Reality Glitch", multiplier: 2400.5, cost: 850000000000 },
-    { name: "The Developer's Cursor", multiplier: 5555.5, cost: 5000000000000 },
-    { name: "Admin Console", multiplier: 12500.0, cost: 45000000000000 },
-    { name: "The 'NULL' Pointer", multiplier: 99999.9, cost: 999000000000000 }
+const BASE_HOE_NAMES = [
+    "Wooden Hoe",
+    "Stone Hoe",
+    "Lapis Hoe",
+    "Gold Hoe",
+    "Iron Hoe",
+    "Diamond Hoe",
+    "Netherite Hoe",
+    "Special Hoe",
+    "Emerald Hoe",
+    "Obsidian Hoe",
+    "Mythic Hoe",
+    "Platinum Hoe",
+    "Titanium Hoe",
+    "God Hoe",
+    "Dark Matter Hoe",
+    "Quantum Hoe",
+    "Singularity Hoe",
+    "Plasma Cutter",
+    "Solar Flare Hoe",
+    "Nebula Harvester",
+    "String Theory Hoe",
+    "Antimatter Scythe",
+    "Time-Weaver's Tool",
+    "Reality Glitch",
+    "The Developer's Cursor",
+    "Admin Console",
+    "The 'NULL' Pointer",
 ];
-const NEW_HOES = [
-    { name: "Copper-Tipped Hoe",       multiplier: 148372.4,      cost: 2847361293 },
-    { name: "Tempered Steel Hoe",      multiplier: 193847.7,      cost: 4193847261 },
-    { name: "Bone-Handle Hoe",         multiplier: 127364.2,      cost: 1847362914 },
-    { name: "River Stone Hoe",         multiplier: 284917.5,      cost: 7384912647 },
-    { name: "Hammered Iron Hoe",       multiplier: 163847.9,      cost: 3274819362 },
-    { name: "Forged Bronze Hoe",       multiplier: 347281.3,      cost: 9184736251 },
-    { name: "Charcoal Hoe",            multiplier: 218473.6,      cost: 5473829164 },
-    { name: "Clay-Fired Hoe",          multiplier: 412836.8,      cost: 13847362914 },
-    { name: "Tungsten Hoe",            multiplier: 294817.1,      cost: 8273641928 },
-    { name: "Layered Alloy Hoe",       multiplier: 538294.7,      cost: 19384726183 },
-    { name: "Polished Granite Hoe",    multiplier: 384729.3,      cost: 11473829641 },
-    { name: "Chilled Iron Hoe",        multiplier: 671834.2,      cost: 24817362914 },
-    { name: "Woven Fiber Hoe",         multiplier: 493817.6,      cost: 16284731928 },
-    { name: "Dense Marble Hoe",        multiplier: 824917.3,      cost: 31847362918 },
-    { name: "Sharpened Flint Hoe",     multiplier: 614738.9,      cost: 21473829164 },
-    { name: "Double-Edged Hoe",        multiplier: 1047382.5,     cost: 47384917263 },
-    { name: "Hollow Reed Hoe",         multiplier: 738291.4,      cost: 28374619283 },
-    { name: "Iron-Bone Composite Hoe", multiplier: 1293847.6,     cost: 61847392716 },
-    { name: "Pressed Timber Hoe",      multiplier: 894173.2,      cost: 34817362941 },
-    { name: "Slotted Titanium Hoe",    multiplier: 1583927.4,     cost: 78473619284 },
-    { name: "Midnight Steel Hoe",      multiplier: 1127364.8,     cost: 49283746192 },
-    { name: "Etched Copper Hoe",       multiplier: 1947382.3,     cost: 97384726193 },
-    { name: "Braided Alloy Hoe",       multiplier: 1384729.5,     cost: 63847291638 },
-    { name: "Refined Obsidian Hoe",    multiplier: 2384719.7,     cost: 124738291647 },
-    { name: "Core-Drilled Hoe",        multiplier: 1748392.6,     cost: 84172936481 },
-    { name: "Fractured Crystal Hoe",   multiplier: 2938471.4,     cost: 158473926184 },
-    { name: "Hollow Bone Hoe",         multiplier: 2193847.8,     cost: 107384726193 },
-    { name: "Silver-Inlaid Hoe",       multiplier: 3617284.2,     cost: 197384716293 },
-    { name: "Petrified Wood Hoe",      multiplier: 2748392.5,     cost: 138473926184 },
-    { name: "Magnetic Core Hoe",       multiplier: 4483917.6,     cost: 248392716384 },
-    { name: "Quartz-Tipped Hoe",       multiplier: 3384729.3,     cost: 174839261847 },
-    { name: "Pressure-Cast Hoe",       multiplier: 5572839.1,     cost: 314729163847 },
-    { name: "Layered Carbon Hoe",      multiplier: 4173829.7,     cost: 223847163928 },
-    { name: "Spun Glass Hoe",          multiplier: 6847291.4,     cost: 389274163847 },
-    { name: "Resonant Steel Hoe",      multiplier: 5284917.2,     cost: 284917362847 },
-    { name: "Tempered Jade Hoe",       multiplier: 8391748.6,     cost: 473826194837 },
-    { name: "Hollow Carbon Hoe",       multiplier: 6473829.4,     cost: 358471629384 },
-    { name: "Phase-Treated Hoe",       multiplier: 10284739.3,    cost: 589274163847 },
-    { name: "Crystalline Shaft Hoe",   multiplier: 7938472.1,     cost: 438291764839 },
-    { name: "Compressed Slate Hoe",    multiplier: 12738491.6,    cost: 723847261938 },
-    { name: "Wound Wire Hoe",          multiplier: 9847362.5,     cost: 548273916384 },
-    { name: "Cold-Pressed Hoe",        multiplier: 15847362.8,    cost: 893847261938 },
-    { name: "Stacked Plate Hoe",       multiplier: 12039284.7,    cost: 683741629384 },
-    { name: "Threaded Coil Hoe",       multiplier: 19384726.3,    cost: 1093847261938 },
-    { name: "Engraved Basalt Hoe",     multiplier: 14738291.4,    cost: 847362918473 },
-    { name: "Sealed Chamber Hoe",      multiplier: 23847162.7,    cost: 1384726193847 },
-    { name: "Helical Edge Hoe",        multiplier: 18293746.5,    cost: 1073829164738 },
-    { name: "Solid Iridium Hoe",       multiplier: 29473816.2,    cost: 1748291638472 },
-    { name: "Fracture-Set Hoe",        multiplier: 22847391.8,    cost: 1384917263847 },
-    { name: "Deep-Forged Hoe",         multiplier: 36184729.4,    cost: 2193847261938 },
-    { name: "Lattice Frame Hoe",       multiplier: 28394716.3,    cost: 1738291647382 },
-    { name: "Orbital Ring Hoe",        multiplier: 44738291.6,    cost: 2748361927384 },
-    { name: "Bound Mineral Hoe",       multiplier: 34729163.8,    cost: 2193847362917 },
-    { name: "Vaulted Steel Hoe",       multiplier: 54839271.4,    cost: 3384719263847 },
-    { name: "Micro-Etched Hoe",        multiplier: 43728194.7,    cost: 2748392716384 },
-    { name: "Segmented Alloy Hoe",     multiplier: 67384912.5,    cost: 4193847261938 },
-    { name: "Pulse-Hardened Hoe",      multiplier: 53847291.3,    cost: 3384917263847 },
-    { name: "Grooved Titanium Hoe",    multiplier: 82739164.8,    cost: 5274381629384 },
-    { name: "Cross-Hatched Hoe",       multiplier: 65839271.4,    cost: 4193847362918 },
-    { name: "Tempered Rhodium Hoe",    multiplier: 101384729.6,   cost: 6473829164738 },
-    { name: "Riveted Plate Hoe",       multiplier: 80293746.2,    cost: 5174839261847 },
-    { name: "Vacuum-Cast Hoe",         multiplier: 124738291.5,   cost: 8193847261938 },
-    { name: "Spindle-Core Hoe",        multiplier: 98374162.8,    cost: 6384729163847 },
-    { name: "Arc-Welded Hoe",          multiplier: 153847291.4,   cost: 10274836194738 },
-    { name: "Dense Iridium Hoe",       multiplier: 121384729.3,   cost: 8093847261938 },
-    { name: "Tensioned Wire Hoe",      multiplier: 189473261.7,   cost: 12847362917384 },
-    { name: "Annealed Edge Hoe",       multiplier: 148372916.5,   cost: 9847362918473 },
-    { name: "Coiled Spring Hoe",       multiplier: 232847619.4,   cost: 15738291647382 },
-    { name: "Hollow Sphere Hoe",       multiplier: 183947261.8,   cost: 12384729163847 },
-    { name: "Differential Blade Hoe",  multiplier: 284917362.5,   cost: 19473826194738 },
-    { name: "Sintered Carbide Hoe",    multiplier: 224738192.3,   cost: 15193847261938 },
-    { name: "Stabilized Core Hoe",     multiplier: 347291638.7,   cost: 23847162938471 },
-    { name: "Tapered Alloy Hoe",       multiplier: 274839261.4,   cost: 18384729163847 },
-    { name: "Pressure-Sintered Hoe",   multiplier: 427364819.2,   cost: 29273916384729 },
-    { name: "Fluted Edge Hoe",         multiplier: 338472916.8,   cost: 22384719263847 },
-    { name: "Radial Groove Hoe",       multiplier: 524817362.5,   cost: 35847261938473 },
-    { name: "Laminated Steel Hoe",     multiplier: 413847291.6,   cost: 27384917263847 },
-    { name: "Torsion-Wound Hoe",       multiplier: 643829174.3,   cost: 44193847261938 },
-    { name: "Milled Plate Hoe",        multiplier: 509384726.8,   cost: 33847291638472 },
-    { name: "Impact-Forged Hoe",       multiplier: 789473261.5,   cost: 53847261938471 },
-    { name: "Hardened Zirconium Hoe",  multiplier: 623847192.4,   cost: 41738291647382 },
-    { name: "Composite Lattice Hoe",   multiplier: 968274163.8,   cost: 65738291647382 },
-    { name: "Gradient Alloy Hoe",      multiplier: 763829174.2,   cost: 50947382716384 },
-    { name: "Precision-Ground Hoe",    multiplier: 1193847261.6,  cost: 80473829164738 },
-    { name: "Stiff-Spine Hoe",         multiplier: 938472916.4,   cost: 62384719263847 },
-    { name: "Friction-Welded Hoe",     multiplier: 1473829164.7,  cost: 98473261938472 },
-    { name: "Hollow Tungsten Hoe",     multiplier: 1154738291.3,  cost: 77384916273847 },
-    { name: "Layered Platinum Hoe",    multiplier: 1827364193.5,  cost: 121384729163847 },
-    { name: "Core-Spun Hoe",           multiplier: 1438291647.8,  cost: 95473829164738 },
-    { name: "Micro-Alloy Hoe",         multiplier: 2274819362.4,  cost: 149384726193847 },
-    { name: "Differential Mesh Hoe",   multiplier: 1783924716.6,  cost: 118473829164738 },
-    { name: "Woven Carbide Hoe",       multiplier: 2793846172.8,  cost: 184917362938471 },
-    { name: "Suspended Core Hoe",      multiplier: 2193847261.5,  cost: 143847291638472 },
-    { name: "Reinforced Lattice Hoe",  multiplier: 3427916384.3,  cost: 227384916273847 },
-    { name: "Stratified Steel Hoe",    multiplier: 2684739162.7,  cost: 177384916273847 },
-    { name: "Dense Osmium Hoe",        multiplier: 4193847261.6,  cost: 278473619284736 },
-    { name: "Coaxial Blade Hoe",       multiplier: 3284917362.4,  cost: 218473926184739 },
-    { name: "Fractured Osmium Hoe",    multiplier: 5147382916.8,  cost: 341829164738291 },
-    { name: "Crystallized Iron Hoe",   multiplier: 4038291647.3,  cost: 267384916273847 },
-    { name: "Absolute Forged Hoe",     multiplier: 6293847162.5,  cost: 418473926184738 },
+
+const NEW_HOE_NAMES = [
+    "Copper-Tipped Hoe",
+    "Tempered Steel Hoe",
+    "Bone-Handle Hoe",
+    "River Stone Hoe",
+    "Hammered Iron Hoe",
+    "Forged Bronze Hoe",
+    "Charcoal Hoe",
+    "Clay-Fired Hoe",
+    "Tungsten Hoe",
+    "Layered Alloy Hoe",
+    "Polished Granite Hoe",
+    "Chilled Iron Hoe",
+    "Woven Fiber Hoe",
+    "Dense Marble Hoe",
+    "Sharpened Flint Hoe",
+    "Double-Edged Hoe",
+    "Hollow Reed Hoe",
+    "Iron-Bone Composite Hoe",
+    "Pressed Timber Hoe",
+    "Slotted Titanium Hoe",
+    "Midnight Steel Hoe",
+    "Etched Copper Hoe",
+    "Braided Alloy Hoe",
+    "Refined Obsidian Hoe",
+    "Core-Drilled Hoe",
+    "Fractured Crystal Hoe",
+    "Hollow Bone Hoe",
+    "Silver-Inlaid Hoe",
+    "Petrified Wood Hoe",
+    "Magnetic Core Hoe",
+    "Quartz-Tipped Hoe",
+    "Pressure-Cast Hoe",
+    "Layered Carbon Hoe",
+    "Spun Glass Hoe",
+    "Resonant Steel Hoe",
+    "Tempered Jade Hoe",
+    "Hollow Carbon Hoe",
+    "Phase-Treated Hoe",
+    "Crystalline Shaft Hoe",
+    "Compressed Slate Hoe",
+    "Wound Wire Hoe",
+    "Cold-Pressed Hoe",
+    "Stacked Plate Hoe",
+    "Threaded Coil Hoe",
+    "Engraved Basalt Hoe",
+    "Sealed Chamber Hoe",
+    "Helical Edge Hoe",
+    "Solid Iridium Hoe",
+    "Fracture-Set Hoe",
+    "Deep-Forged Hoe",
+    "Lattice Frame Hoe",
+    "Orbital Ring Hoe",
+    "Bound Mineral Hoe",
+    "Vaulted Steel Hoe",
+    "Micro-Etched Hoe",
+    "Segmented Alloy Hoe",
+    "Pulse-Hardened Hoe",
+    "Grooved Titanium Hoe",
+    "Cross-Hatched Hoe",
+    "Tempered Rhodium Hoe",
+    "Riveted Plate Hoe",
+    "Vacuum-Cast Hoe",
+    "Spindle-Core Hoe",
+    "Arc-Welded Hoe",
+    "Dense Iridium Hoe",
+    "Tensioned Wire Hoe",
+    "Annealed Edge Hoe",
+    "Coiled Spring Hoe",
+    "Hollow Sphere Hoe",
+    "Differential Blade Hoe",
+    "Sintered Carbide Hoe",
+    "Stabilized Core Hoe",
+    "Tapered Alloy Hoe",
+    "Pressure-Sintered Hoe",
+    "Fluted Edge Hoe",
+    "Radial Groove Hoe",
+    "Laminated Steel Hoe",
+    "Torsion-Wound Hoe",
+    "Milled Plate Hoe",
+    "Impact-Forged Hoe",
+    "Hardened Zirconium Hoe",
+    "Composite Lattice Hoe",
+    "Gradient Alloy Hoe",
+    "Precision-Ground Hoe",
+    "Stiff-Spine Hoe",
+    "Friction-Welded Hoe",
+    "Hollow Tungsten Hoe",
+    "Layered Platinum Hoe",
+    "Core-Spun Hoe",
+    "Micro-Alloy Hoe",
+    "Differential Mesh Hoe",
+    "Woven Carbide Hoe",
+    "Suspended Core Hoe",
+    "Reinforced Lattice Hoe",
+    "Stratified Steel Hoe",
+    "Dense Osmium Hoe",
+    "Coaxial Blade Hoe",
+    "Fractured Osmium Hoe",
+    "Crystallized Iron Hoe",
+    "Absolute Forged Hoe",
 ];
-const HOES = [...BASE_HOES, ...NEW_HOES];
+
+const HOE_NAMES = [...BASE_HOE_NAMES, ...NEW_HOE_NAMES];
+
+// Rebalance knobs: edit anchor values to reshape the full progression curve.
+const HOE_MULTIPLIER_ANCHORS = [
+    { index: 0, value: 1 },
+    { index: 3, value: 2.6 },
+    { index: 7, value: 5.8 },
+    { index: 11, value: 14 },
+    { index: 15, value: 52 },
+    { index: 19, value: 260 },
+    { index: 21, value: 1200 },
+    { index: 23, value: 6000 },
+    { index: 26, value: 60000 },
+    { index: 40, value: 900000 },
+    { index: 60, value: 12000000 },
+    { index: 80, value: 135000000 },
+    { index: 100, value: 1300000000 },
+    { index: 126, value: 6200000000 },
+];
+
+const HOE_COST_ANCHORS = [
+    { index: 0, value: 0 },
+    { index: 1, value: 500 },
+    { index: 5, value: 5000 },
+    { index: 11, value: 120000 },
+    { index: 15, value: 4500000 },
+    { index: 19, value: 250000000 },
+    { index: 21, value: 25000000000 },
+    { index: 23, value: 850000000000 },
+    { index: 26, value: 8000000000000 },
+    { index: 40, value: 30000000000000 },
+    { index: 60, value: 800000000000000 },
+    { index: 80, value: 15000000000000000 },
+    { index: 100, value: 250000000000000000 },
+    { index: 126, value: 12000000000000000000 },
+];
+
+function roundToSignificant(value, digits = 3) {
+    if (value === 0) return 0;
+    const abs = Math.abs(value);
+    const exponent = Math.floor(Math.log10(abs));
+    const factor = Math.pow(10, exponent - digits + 1);
+    return Math.round(value / factor) * factor;
+}
+
+function getProgressionStep(previous) {
+    if (previous < 10) return 0.1;
+    if (previous < 100) return 0.5;
+    if (previous < 1000) return 1;
+    return Math.max(1, roundToSignificant(previous * 0.01, 1));
+}
+
+function buildAnchoredProgression(length, anchors, roundFn) {
+    const sortedAnchors = [...anchors].sort((a, b) => a.index - b.index);
+    const firstAnchor = sortedAnchors[0];
+    const lastAnchor = sortedAnchors[sortedAnchors.length - 1];
+
+    if (!firstAnchor || !lastAnchor || firstAnchor.index !== 0 || lastAnchor.index !== length - 1) {
+        throw new Error("Progression anchors must start at index 0 and end at the final index.");
+    }
+
+    const values = new Array(length).fill(0);
+
+    for (let segment = 0; segment < sortedAnchors.length - 1; segment++) {
+        const start = sortedAnchors[segment];
+        const end = sortedAnchors[segment + 1];
+        const span = end.index - start.index;
+
+        for (let offset = 0; offset <= span; offset++) {
+            const index = start.index + offset;
+            if (offset === 0 && segment > 0) continue;
+
+            const t = span === 0 ? 0 : offset / span;
+            let value;
+            if (start.value > 0 && end.value > 0) {
+                value = Math.exp(Math.log(start.value) + (Math.log(end.value) - Math.log(start.value)) * t);
+            } else {
+                value = start.value + ((end.value - start.value) * t);
+            }
+            values[index] = roundFn(value);
+        }
+    }
+
+    for (let i = 1; i < values.length; i++) {
+        if (values[i] <= values[i - 1]) {
+            values[i] = roundFn(values[i - 1] + getProgressionStep(values[i - 1]));
+        }
+    }
+
+    return values;
+}
+
+const roundHoeMultiplier = (value) => {
+    if (value < 10) return Number(value.toFixed(2));
+    if (value < 100) return Number(value.toFixed(1));
+    if (value < 1000) return Math.round(value);
+    return Math.max(1000, roundToSignificant(value, 4));
+};
+
+const roundHoeCost = (value) => {
+    if (value <= 0) return 0;
+    return Math.max(1, Math.round(roundToSignificant(value, 3)));
+};
+
+const HOE_MULTIPLIERS = buildAnchoredProgression(HOE_NAMES.length, HOE_MULTIPLIER_ANCHORS, roundHoeMultiplier);
+const HOE_COSTS = buildAnchoredProgression(HOE_NAMES.length, HOE_COST_ANCHORS, roundHoeCost);
+
+const HOES = HOE_NAMES.map((name, index) => ({
+    name,
+    multiplier: HOE_MULTIPLIERS[index],
+    cost: HOE_COSTS[index]
+}));
+
+const BASE_HOES = HOES.slice(0, BASE_HOE_NAMES.length);
+const NEW_HOES = HOES.slice(BASE_HOE_NAMES.length);
 
 // List of Plant Rarity Levels:
 // 01  common
