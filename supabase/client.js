@@ -9,6 +9,35 @@
     let flushTimer = null;
     let saveInFlight = false;
 
+    function isNetworkFailure(error) {
+        const message = String(error?.message || error || "");
+        return /networkerror|failed to fetch|load failed|network request failed|fetch failed|resolve|dns/i.test(message);
+    }
+
+    function createUnavailableError() {
+        const config = readConfig();
+        let host = "";
+        try {
+            host = config.url ? new URL(config.url).host : "";
+        } catch {
+            host = String(config.url || "").replace(/^https?:\/\//i, "").split("/")[0];
+        }
+        const suffix = host ? ` (${host})` : "";
+        return new Error(`Cloud services are currently unreachable${suffix}. Update supabase/config.js or remove cloud config to use local-only mode.`);
+    }
+
+    function markUnavailable() {
+        client = null;
+        setActiveUser(null);
+        return {
+            configured: false,
+            unavailable: true,
+            user: null,
+            profile: null,
+            error: createUnavailableError()
+        };
+    }
+
     function trimTrailingSlash(value) {
         return value.replace(/\/+$/, "");
     }
@@ -160,13 +189,14 @@
     async function init({ requireAuth = false, redirectTo } = {}) {
         const config = readConfig();
         if (!config.url || !config.anonKey) {
-            return { configured: false, user: null, profile: null };
+            return { configured: false, unavailable: false, user: null, profile: null };
         }
 
         const supabaseClient = ensureClient();
         if (!supabaseClient) {
             return {
                 configured: true,
+                unavailable: false,
                 user: null,
                 profile: null,
                 error: new Error("Supabase client library was not loaded.")
@@ -177,6 +207,9 @@
         try {
             sessionData = await supabaseClient.auth.getSession();
         } catch (sessionError) {
+            if (isNetworkFailure(sessionError)) {
+                return markUnavailable();
+            }
             return { configured: true, user: null, profile: null, error: sessionError };
         }
 
@@ -202,6 +235,7 @@
 
         return {
             configured: true,
+            unavailable: false,
             user: activeUser,
             profile: cachedProfile
         };

@@ -3,7 +3,8 @@
     const AUTH_STATUS_MESSAGES = {
         checking: "Checking account access...",
         guest: "Not signed in. Create an account or log in to enter your farm.",
-        unconfigured: "Cloud auth is not configured yet. Update Supabase settings to enable sign in.",
+        unconfigured: "Cloud auth is not configured. You can still open the field console in local mode.",
+        offline: "Cloud auth is currently unreachable. You can still continue in local mode.",
         error: "Could not verify session. You can still continue to sign in manually."
     };
 
@@ -24,16 +25,32 @@
         return `${path}${separator}next=${encodeURIComponent(GAME_ENTRY)}`;
     }
 
-    function wireAuthLinks() {
-        if (loginLink) loginLink.href = withNext("login.html");
-        if (signupLink) signupLink.href = withNext("signup.html");
+    function setLinkTargets(loginTarget, signupTarget) {
+        if (loginLink) loginLink.href = loginTarget;
+        if (signupLink) signupLink.href = signupTarget;
 
         document.querySelectorAll("a[href='login.html?next=game.html']").forEach((anchor) => {
-            anchor.href = withNext("login.html");
+            anchor.href = loginTarget;
         });
         document.querySelectorAll("a[href='signup.html?next=game.html']").forEach((anchor) => {
-            anchor.href = withNext("signup.html");
+            anchor.href = signupTarget;
         });
+    }
+
+    function setCloudAuthLinks() {
+        setLinkTargets(withNext("login.html"), withNext("signup.html"));
+        if (loginLink) loginLink.textContent = "Log In";
+        if (signupLink) signupLink.textContent = "Create Account";
+    }
+
+    function setLocalModeLinks() {
+        setLinkTargets(GAME_ENTRY, GAME_ENTRY);
+        if (loginLink) loginLink.textContent = "Field Console";
+        if (signupLink) signupLink.textContent = "Open Local Mode";
+    }
+
+    function wireAuthLinks() {
+        setCloudAuthLinks();
     }
 
     function setupScrollReveal() {
@@ -147,11 +164,19 @@
                 return;
             }
 
+            if (initResult?.unavailable) {
+                setLocalModeLinks();
+                setAuthState("offline");
+                return;
+            }
+
             if (!initResult?.configured) {
+                setLocalModeLinks();
                 setAuthState("unconfigured");
                 return;
             }
 
+            setCloudAuthLinks();
             setAuthState("guest");
         } catch (error) {
             console.error("Promo auth check failed:", error);

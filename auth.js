@@ -7,6 +7,7 @@
         { key: "special", label: "a special character", check: checkSpecialCharacter },
         { key: "minLength", label: `${PASSWORD_MIN_LENGTH}+ characters`, check: checkMinLength }
     ];
+    let authFormsLocked = false;
 
     const nextTarget = sanitizeNextTarget(new URLSearchParams(window.location.search).get("next"));
 
@@ -166,7 +167,18 @@
 
     function syncSubmitAvailability(submitBtn, fieldsFilled, passwordIsValid) {
         if (!submitBtn) return;
+        if (authFormsLocked) {
+            submitBtn.disabled = true;
+            return;
+        }
         submitBtn.disabled = !(fieldsFilled && passwordIsValid);
+    }
+
+    function setAuthFormsDisabled(disabled) {
+        authFormsLocked = Boolean(disabled);
+        document.querySelectorAll(".auth-form button[type='submit']").forEach((button) => {
+            button.disabled = authFormsLocked || button.disabled;
+        });
     }
 
     async function initialize() {
@@ -183,16 +195,26 @@
 
         if (!supabaseApi) {
             setStatus("Authentication client failed to load. Check script includes.", "error");
+            setAuthFormsDisabled(true);
             return;
         }
 
-        if (!supabaseApi.isConfigured()) {
+        const initResult = await supabaseApi.init();
+        if (initResult?.unavailable) {
+            setStatus(initResult.error?.message || "Cloud authentication is unavailable. You can still use local mode from game.html.", "error");
+            setAuthFormsDisabled(true);
+            return;
+        }
+
+        if (!initResult?.configured) {
             setStatus("Authentication config missing. Update your project auth config with project URL and anon key.", "error");
+            setAuthFormsDisabled(true);
             return;
         }
 
-        const redirected = await supabaseApi.redirectIfAuthenticated(nextTarget);
-        if (redirected) return;
+        if (initResult.user) {
+            window.location.href = nextTarget;
+        }
     }
 
     function setupLoginForm(supabaseApi) {
@@ -204,6 +226,10 @@
         const passwordInput = document.getElementById("login-password");
 
         const syncLoginSubmitState = () => {
+            if (authFormsLocked) {
+                submitBtn.disabled = true;
+                return;
+            }
             const email = emailInput?.value.trim() || "";
             const password = passwordInput?.value || "";
             submitBtn.disabled = !(email && password);
@@ -221,6 +247,11 @@
 
             if (!email || !password) {
                 setStatus("Enter both email and password.", "error");
+                syncLoginSubmitState();
+                return;
+            }
+            if (authFormsLocked) {
+                setStatus("Cloud authentication is unavailable. You can still use local mode from game.html.", "error");
                 syncLoginSubmitState();
                 return;
             }
@@ -261,6 +292,10 @@
         });
 
         const syncSignupSubmitState = () => {
+            if (authFormsLocked) {
+                submitBtn.disabled = true;
+                return;
+            }
             const displayName = displayNameInput?.value.trim() || "";
             const email = emailInput?.value.trim() || "";
             const confirmPassword = confirmPasswordInput?.value || "";
@@ -288,6 +323,11 @@
 
             if (!displayName || !email || !password || !confirmPassword) {
                 setStatus("Fill out all required fields.", "error");
+                syncSignupSubmitState();
+                return;
+            }
+            if (authFormsLocked) {
+                setStatus("Cloud authentication is unavailable. You can still use local mode from game.html.", "error");
                 syncSignupSubmitState();
                 return;
             }

@@ -431,6 +431,10 @@ main {
     color: #1d552c;
 }
 
+[data-auth-state="offline"] .hero-auth-note {
+    color: #7d4c11;
+}
+
 [data-auth-state="unconfigured"] .hero-auth-note,
 [data-auth-state="error"] .hero-auth-note {
     color: #8e3a1f;
